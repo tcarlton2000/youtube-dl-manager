@@ -1,0 +1,13 @@
+# Python venv
+youtube-dl-manager/
+
+# Python caches
+.cache
+.pytest_cache
+__pycache__
+
+# Coverage files
+.coverage
+
+# VSCode files
+.vscode
