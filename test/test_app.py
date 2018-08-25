@@ -8,6 +8,12 @@ youtube.db.create_all()
 client = youtube.app.test_client()
 
 
+possible_download_names = [
+    "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.webm",
+    "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.f135.mp4"
+]
+
+
 def test_download_file():
     resp = client.post("/downloads", data=json.dumps({
         "url": "https://www.youtube.com/watch?v=nTfCxORgKEk",
@@ -24,9 +30,11 @@ def test_download_file():
         assert get_resp.get_json()['status'] != "Error"
         get_resp = client.get("/downloads/{}".format(_id))
 
-    assert get_resp.get_json()["name"] == "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.f135.mp4"
+    assert get_resp.get_json()["name"] in possible_download_names
     assert get_resp.get_json()["directory"] == "."
-    assert os.path.isfile("The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.mkv")
+
+    filename = get_resp.get_json()["name"].replace(".f135.mp4", ".mkv")
+    assert os.path.isfile(filename)
 
 
 def test_get_download_list():
