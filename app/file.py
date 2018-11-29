@@ -1,5 +1,6 @@
 import re
-from app import db
+
+from app.main import db
 
 
 class File(db.Model):
@@ -22,8 +23,7 @@ class File(db.Model):
 
     @classmethod
     def new_file(cls, url, directory):
-        new_file = File(url=url, directory=directory,
-                        status="In Progress", log="")
+        new_file = File(url=url, directory=directory, status="In Progress", log="")
         db.session.add(new_file)
         db.session.commit()
         return new_file
@@ -32,7 +32,7 @@ class File(db.Model):
         self.log += line
 
         if self.name is None:
-            name_re = re.search(r'Destination: (.*)', line)
+            name_re = re.search(r"Destination: (.*)", line)
             if name_re:
                 self.name = name_re.group(1)
 
@@ -52,7 +52,7 @@ class File(db.Model):
             "name": self.name,
             "url": self.url,
             "directory": self.directory,
-            "status": self.status
+            "status": self.status,
         }
 
     def marshal(self):
@@ -62,5 +62,5 @@ class File(db.Model):
             "url": self.url,
             "directory": self.directory,
             "status": self.status,
-            "log": self.log
+            "log": self.log,
         }

@@ -1,7 +1,7 @@
 import subprocess
 import threading
 
-from file import File
+from app.file import File
 
 
 class Download(threading.Thread):
@@ -14,15 +14,20 @@ class Download(threading.Thread):
     def run(self):
         cmd = "youtube-dl {}".format(self.url)
         cwd = self.directory or "/downloads"
-        p = subprocess.Popen(cmd.split(), cwd=cwd, universal_newlines=True,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(
+            cmd.split(),
+            cwd=cwd,
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
         new_file = File.new_file(self.url, cwd)
         self.id = new_file.id
 
         while True:
             output = p.stdout.readline()
-            if output == '' and p.poll() is not None:
+            if output == "" and p.poll() is not None:
                 if p.poll() == 0:
                     new_file.complete()
                 else:
