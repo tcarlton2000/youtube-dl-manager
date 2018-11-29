@@ -1,20 +1,19 @@
 import json
-from flask import request, Response
+
+from flask import Response, request
 from werkzeug.exceptions import NotFound
 
-import errors  # noqa: F401
-from app import app, db
-from file import File
-from download import Download
+from app import errors  # noqa: F401
+from app.download import Download
+from app.file import File
+from app.main import app, db
 
 
 def json_response(payload, status):
-    return Response(json.dumps(payload),
-                    status=status,
-                    mimetype="application/json")
+    return Response(json.dumps(payload), status=status, mimetype="application/json")
 
 
-@app.route('/downloads', methods=['GET', 'POST'])
+@app.route("/downloads", methods=["GET", "POST"])
 def downloads():
     if request.method == "POST":
         body = request.json
@@ -25,7 +24,7 @@ def downloads():
         return json_response(files, 200)
 
 
-@app.route('/downloads/<int:file_id>')
+@app.route("/downloads/<int:file_id>")
 def download(file_id):
     _file = File.get_file(file_id)
     if _file is None:
@@ -38,11 +37,9 @@ def start_download(url, directory):
     download.start()
     while download.id is None:
         pass
-    return {
-        "id": download.id
-    }
+    return {"id": download.id}
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host="0.0.0.0", port=5000)
