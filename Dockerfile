@@ -5,7 +5,7 @@ RUN apk update && apk add ffmpeg && rm -rf /var/cache/apk/*
 COPY . /app
 WORKDIR /app
 
-RUN pip install -r requirements.txt
+RUN pip install pipenv && pipenv install
 
-ENTRYPOINT [ "python" ]
-CMD ["app/youtube.py"]
+ENV PYTHONPATH /app
+CMD ["pipenv", "run", "python", "app/youtube.py"]
