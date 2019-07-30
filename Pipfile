@@ -8,6 +8,7 @@ flake8 = "*"
 pytest = "*"
 pytest-cov = "*"
 black = "==18.9b0"
+v = {editable = true,version = "*"}
 
 [packages]
 Flask = "*"
