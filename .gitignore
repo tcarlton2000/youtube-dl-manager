@@ -11,3 +11,6 @@ __pycache__
 
 # VSCode files
 .vscode
+
+# Intellij Files
+.idea
