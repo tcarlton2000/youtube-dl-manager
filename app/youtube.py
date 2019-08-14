@@ -1,6 +1,6 @@
 import json
 
-from flask import Response, request
+from flask import Response, request, render_template
 from werkzeug.exceptions import NotFound
 
 from app import errors  # noqa: F401
@@ -11,6 +11,11 @@ from app.main import app, db
 
 def json_response(payload, status):
     return Response(json.dumps(payload), status=status, mimetype="application/json")
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
 @app.route("/downloads", methods=["GET", "POST"])

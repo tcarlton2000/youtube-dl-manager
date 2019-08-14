@@ -14,3 +14,14 @@ __pycache__
 
 # Intellij Files
 .idea
+
+# DB Files
+test.db
+youtube-dl.db
+
+# NodeJS Files
+node_modules
+bundle.js
+*.eot
+*.svg
+*.ttf
