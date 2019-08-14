@@ -59,3 +59,10 @@ def test_get_download_list():
 def test_get_download_not_found():
     resp = client.get("/downloads/9999")
     assert resp.status == "404 NOT FOUND"
+
+
+def test_index():
+    resp = client.get("/")
+    assert resp.status == "200 OK"
+    assert resp.mimetype == "text/html"
+    assert "<html>" in str(resp.get_data())
