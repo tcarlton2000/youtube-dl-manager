@@ -6,16 +6,14 @@ import DownloadButton from 'Components/DownloadButton'
 import { Container } from 'semantic-ui-react'
 
 
-class App extends React.Component {
-    render() {
-        return (
-            <Container margin={20}>
-                <h1>Youtube Download Manager</h1>
-                <DownloadButton />
-                <DownloadList />
-            </Container>
-        );
-    }
+const App = () => {
+    return (
+        <Container margin={20}>
+            <h1>Youtube Download Manager</h1>
+            <DownloadButton />
+            <DownloadList />
+        </Container>
+    );
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));

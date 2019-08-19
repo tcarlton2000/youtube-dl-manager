@@ -10,4 +10,4 @@ def create_app(database_uri, debug=False):
     return app, db
 
 
-app, db = create_app("sqlite:////app/youtube-dl.db", debug=True)
+app, db = create_app("sqlite:////config/youtube-dl.db", debug=True)
