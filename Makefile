@@ -5,7 +5,9 @@ install:
 
 lint:
 	pipenv run flake8 ./app
-	pipenv run black ./ --check
+	pipenv run black ./app --check
+	pipenv run flake8 ./test
+	pipenv run black ./test --check
 
 format:
 	pipenv run black ./
