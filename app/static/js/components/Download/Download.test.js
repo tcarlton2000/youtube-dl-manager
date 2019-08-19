@@ -5,14 +5,10 @@ import {render} from '@testing-library/react'
 import Download from '../Download'
 
 test('should render download name and status', () => {
-    const downloadJson = {
-        name: "Download Name",
-        status: "Download Status"
-    }
     const {getByText} = render(
-        <Download info={downloadJson} />
+        <Download name={"Download Name"} status={"Download Status"} />
 )
 
-    expect(getByText(downloadJson.name)).toBeInTheDocument()
-    expect(getByText(downloadJson.status)).toBeInTheDocument()
+    expect(getByText("Download Name")).toBeInTheDocument()
+    expect(getByText("Download Status")).toBeInTheDocument()
 })

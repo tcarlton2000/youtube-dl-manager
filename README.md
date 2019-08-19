@@ -11,5 +11,5 @@ Coming Soon
     ```
 2. Start docker image
     ```
-    docker run -v <path to download folder>:/downloads youtube-dl-manager
+    docker run -v <path to download folder>:/downloads -v <path to config dir>:/config youtube-dl-manager
     ```

@@ -1,40 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import T from "prop-types";
 import Download from 'Components/Download'
-import { Segment, Loader } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer } from 'semantic-ui-react'
 
+export const DownloadListProvider = () => {
+    const [downloads, setDownloads] = useState(null );
+    let reloadDownloads = false
 
-export class DownloadList extends React.Component {
-    state = {
-        downloads: null
-    }
-
-    componentDidMount() {
+    useEffect(() => {
         fetch("http://172.17.0.2:5000/downloads")
             .then((response) => response.json())
             .then((responseJson) => {
-                this.setState({
-                    downloads: responseJson
-                })
+                setDownloads(responseJson)
             })
             .catch((error) => {
                 console.error(error)
             })
-    }
+    }, [])
 
-    render() {
-        if (this.state.downloads !== null) {
-            return (
-                <Segment.Group raised>
-                    {this.state.downloads.map(
-                        item =>
-                        <Download key={item.id} info={item} />
-                        )
-                    }
-                </Segment.Group>
-            )
-        } else {
-            return <Loader />
-        }
+    return (
+        <DownloadListModel downloads={downloads} />
+    )
+}
+
+export const DownloadListModel = ({downloads}) => {
+    if (downloads !== null) {
+        return (
+            <Segment.Group raised>
+                {downloads.map(
+                    item =>
+                    <Download
+                        key={item.id}
+                        name={item.name}
+                        status={item.status}
+                    />
+                    )
+                }
+            </Segment.Group>
+        )
+    } else {
+        return  (
+            <Dimmer active inverted>
+                <Loader>Loading</Loader>
+            </Dimmer>
+        )
     }
+}
+
+DownloadListModel.proptypes = {
+    downloads: T.array
+}
+
+export const DownloadList = () => {
+    return (
+        <DownloadListProvider />
+    )
 }
