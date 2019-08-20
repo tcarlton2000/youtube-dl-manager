@@ -31,16 +31,23 @@ def test_download_file():
     _id = resp.json["id"]
 
     get_resp = client.get("/downloads/{}".format(_id))
+    prev_percent = 0.0
     while get_resp.get_json()["status"] != "Completed":
         assert get_resp.get_json()["status"] != "Error"
+        assert get_resp.get_json()["percent"] >= prev_percent
+        prev_percent = get_resp.get_json()["percent"]
         get_resp = client.get("/downloads/{}".format(_id))
 
     print(get_resp.get_json())
 
     assert get_resp.get_json()["name"] in possible_download_names
     assert get_resp.get_json()["directory"] == "."
+    assert get_resp.get_json()["percent"] == 100.0
+    assert get_resp.get_json()["time_remaining"] == "00:00"
+    assert get_resp.get_json()["size"] != ""
+    assert get_resp.get_json()["speed"] != ""
 
-    filename = get_resp.get_json()["name"].replace(".f135.mp4", ".mkv")
+    filename = get_resp.get_json()["name"]
     assert os.path.isfile(filename)
 
 

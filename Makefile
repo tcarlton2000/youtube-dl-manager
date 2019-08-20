@@ -10,7 +10,8 @@ lint:
 	pipenv run black ./test --check
 
 format:
-	pipenv run black ./
+	pipenv run black ./app
+	pipenv run black ./test
 
 unittest:
 	PYTHONPATH=${PWD} pipenv run py.test -v test/ --cov=app/ --cov-report term-missing --cov-fail-under 90
