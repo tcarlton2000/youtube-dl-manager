@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css'
+import './Compact.css'
 import DownloadList from 'Components/DownloadList'
 import DownloadButton from 'Components/DownloadButton'
 import { Container } from 'semantic-ui-react'

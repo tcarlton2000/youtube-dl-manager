@@ -34,6 +34,10 @@ export const DownloadListModel = ({downloads}) => {
                         key={item.id}
                         name={item.name}
                         status={item.status}
+                        percent={item.percent}
+                        size={item.size}
+                        speed={item.speed}
+                        time_remaining={item.time_remaining}
                     />
                     )
                 }

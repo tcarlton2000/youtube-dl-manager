@@ -11,12 +11,20 @@ test('should fetch and render download list', async () => {
         {
             id:0,
             name: "Download One",
-            status: "In Progress"
+            status: "In Progress",
+            percent: 50.0,
+            size: "30.6MiB",
+            speed: "100KiB/s",
+            time_remaining: "00:38"
         },
         {
             id:1,
             name: "Download Two",
-            status: "Completed"
+            status: "Completed",
+            percent: 100.0,
+            size: "52.8MiB",
+            speed: "0KiB/s",
+            time_remaining: "00:00"
         }
     ]
 
@@ -34,9 +42,27 @@ test('should fetch and render download list', async () => {
     const secondDownloadText = await findByText("Download Two")
     expect(secondDownloadText).toBeInTheDocument()
 
-    const firstDownloadStatus = await findByText("In Progress")
-    expect(firstDownloadStatus).toBeInTheDocument()
+    const firstDownloadPercent = await findByText("50%")
+    expect(firstDownloadPercent).toBeInTheDocument()
 
-    const secondDownloadStatus = await findByText("Completed")
-    expect(secondDownloadStatus).toBeInTheDocument()
+    const secondDownloadPercent = await findByText("100%")
+    expect(secondDownloadPercent).toBeInTheDocument()
+
+    const firstDownloadSize = await findByText("30.6MiB")
+    expect(firstDownloadSize).toBeInTheDocument()
+
+    const secondDownloadSize = await findByText("52.8MiB")
+    expect(secondDownloadSize).toBeInTheDocument()
+
+    const firstDownloadSpeed = await findByText("100KiB/s")
+    expect(firstDownloadSpeed).toBeInTheDocument()
+
+    const secondDownloadSpeed = await findByText("0KiB/s")
+    expect(secondDownloadSpeed).toBeInTheDocument()
+
+    const firstDownloadTimeRemaining = await findByText("00:38")
+    expect(firstDownloadTimeRemaining).toBeInTheDocument()
+
+    const secondDownloadTimeRemaining = await findByText("00:00")
+    expect(secondDownloadTimeRemaining).toBeInTheDocument()
 })
