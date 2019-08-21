@@ -1,6 +1,6 @@
 module.exports = {
     entry: [
-        './app/static/js/index.js'
+        './app/client/index.js'
     ],
     module: {
         rules: [
