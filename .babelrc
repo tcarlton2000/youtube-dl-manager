@@ -8,9 +8,9 @@
     [
       "module-resolver",
       {
-        "root": ["./app/static/js"],
+        "root": ["./app/client"],
         "alias": {
-          "Components": "./app/static/js/components"
+          "Components": "./app/client/components"
         }
       }
     ]
