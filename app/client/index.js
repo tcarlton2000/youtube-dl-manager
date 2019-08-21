@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css'
 import './Compact.css'
 import DownloadList from 'Components/DownloadList'
-import DownloadButton from 'Components/DownloadButton'
+import DownloadModal from 'Components/DownloadModal'
 import { Container } from 'semantic-ui-react'
 
 
@@ -11,7 +11,7 @@ const App = () => {
     return (
         <Container margin={20}>
             <h1>Youtube Download Manager</h1>
-            <DownloadButton />
+            <DownloadModal />
             <DownloadList />
         </Container>
     );
