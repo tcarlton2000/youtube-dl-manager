@@ -7,12 +7,15 @@ export const Download = ({ name, status, percent, size, speed, time_remaining })
     return (
         <Segment>
             <Grid className="compact">
-                <Grid.Row columns={2}>
-                    <Grid.Column width={12}>
+                <Grid.Row columns={1}>
+                    <Grid.Column>
                         <h4>{name}</h4>
+                        <p></p>
                     </Grid.Column>
-                    <Grid.Column width={4}>
-                        <Progress percent={percent} indicating progress autoSuccess />
+                </Grid.Row>
+                <Grid.Row column={1}>
+                    <Grid.Column>
+                        <Progress percent={percent} indicating progress autoSuccess margin="0px" />
                     </Grid.Column>
                 </Grid.Row>
                 <Grid.Row columns={3}>

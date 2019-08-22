@@ -17,7 +17,7 @@ class File(db.Model):
 
     @classmethod
     def get_all_files(cls):
-        query = File.query.all()
+        query = File.query.order_by(File.id.desc()).all()
         return [item.list_marshal() for item in query]
 
     @classmethod
