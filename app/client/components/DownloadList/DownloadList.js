@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import T from "prop-types";
 import Download from 'Components/Download'
 import { Segment, Loader, Dimmer } from 'semantic-ui-react'
 
 export const DownloadListProvider = () => {
     const [downloads, setDownloads] = useState(null );
-    let reloadDownloads = false
 
     useEffect(() => {
         fetch("http://172.17.0.2:5000/downloads")

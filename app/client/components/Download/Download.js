@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import T from 'prop-types'
 import { Segment, Progress, Grid } from 'semantic-ui-react'
 
