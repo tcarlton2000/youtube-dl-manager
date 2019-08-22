@@ -7,15 +7,18 @@ export const DownloadListProvider = () => {
     const [downloads, setDownloads] = useState(null );
 
     useEffect(() => {
-        fetch("http://172.17.0.2:5000/downloads")
-            .then((response) => response.json())
-            .then((responseJson) => {
-                setDownloads(responseJson)
-            })
-            .catch((error) => {
-                console.error(error)
-            })
-    }, [])
+        const interval = setInterval(() => {
+            fetch("http://172.17.0.2:5000/downloads")
+                .then((response) => response.json())
+                .then((responseJson) => {
+                    setDownloads(responseJson)
+                })
+                .catch((error) => {
+                    console.error(error)
+                })
+            }, 1000);
+            return () => clearInterval(interval)
+        }, [])
 
     return (
         <DownloadListModel downloads={downloads} />
