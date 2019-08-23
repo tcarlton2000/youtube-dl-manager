@@ -52,6 +52,16 @@ export const DownloadModalModel = ({ setUrl, setDirectory, url, directory, submi
     }
 
     const closeModal = () => {
+        setUrl({
+            target: {
+                value: ''
+            }
+        })
+        setDirectory({
+            target: {
+                value: '/downloads'
+            }
+        })
         setShowModal(false)
     }
 
