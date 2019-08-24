@@ -14,7 +14,7 @@ class Download(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        cmd = "youtube-dl {}".format(self.url)
+        cmd = "youtube-dl --no-mtime {}".format(self.url)
         cwd = self.directory or "/downloads"
         p = subprocess.Popen(
             cmd.split(),
