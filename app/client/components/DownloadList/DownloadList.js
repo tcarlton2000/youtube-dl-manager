@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import T from "prop-types";
 import Download from 'Components/Download'
 import { Segment, Loader, Dimmer } from 'semantic-ui-react'
+import getRoute from 'Utils/getRoute'
 
 export const DownloadListProvider = () => {
     const [downloads, setDownloads] = useState(null );
 
     useEffect(() => {
         const interval = setInterval(() => {
-            fetch("http://172.17.0.2:5000/downloads")
+            fetch(getRoute("/downloads"))
                 .then((response) => response.json())
                 .then((responseJson) => {
                     setDownloads(responseJson)

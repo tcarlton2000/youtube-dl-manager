@@ -10,7 +10,8 @@
       {
         "root": ["./app/client"],
         "alias": {
-          "Components": "./app/client/components"
+          "Components": "./app/client/components",
+          "Utils": "./app/client/utils"
         }
       }
     ]
