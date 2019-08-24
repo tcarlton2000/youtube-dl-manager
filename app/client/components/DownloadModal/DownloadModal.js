@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Button, Modal, Form } from 'semantic-ui-react'
+import getRoute from 'Utils/getRoute'
 
 
 export const DownloadModal = () => {
@@ -15,7 +16,7 @@ export const DownloadModal = () => {
     }
 
     const submit = () => {
-        fetch('http://172.17.0.2:5000/downloads', {
+        fetch(getRoute('/downloads'), {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
