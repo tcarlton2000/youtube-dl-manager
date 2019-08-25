@@ -9,7 +9,7 @@ test('should render download name and status', () => {
         <Download
             name={"Download Name"}
             status={"Download Status"}
-            percent={50.0}
+            percent={50.5}
             size={"23MiB"}
             speed={"1.23MiB/s"}
             time_remaining={"01:34"}
