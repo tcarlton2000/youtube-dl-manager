@@ -15,7 +15,7 @@ export const Download = ({ name, status, percent, size, speed, time_remaining })
                 </Grid.Row>
                 <Grid.Row column={1}>
                     <Grid.Column>
-                        <Progress percent={percent} indicating progress autoSuccess margin="0px" />
+                        <Progress percent={Math.floor(percent)} indicating progress autoSuccess margin="0px" />
                     </Grid.Column>
                 </Grid.Row>
                 <Grid.Row columns={3}>
