@@ -1,5 +1,5 @@
 # Youtube Download Manager
-This application is a API (and soon to be UI) wrapper around the youtube-dl app.
+This application is a API and UI wrapper around the youtube-dl app.
 
 ## Installation
 Coming Soon
