@@ -14,7 +14,7 @@ test('should fetch and render download list', async () => {
       percent: 50.0,
       size: '30.6MiB',
       speed: '100KiB/s',
-      time_remaining: '00:38',
+      timeRemaining: '00:38',
     },
     {
       id: 1,
@@ -23,7 +23,7 @@ test('should fetch and render download list', async () => {
       percent: 100.0,
       size: '52.8MiB',
       speed: '0KiB/s',
-      time_remaining: '00:00',
+      timeRemaining: '00:00',
     },
   ];
 

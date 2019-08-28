@@ -49,7 +49,7 @@ export const Download = ({
 Download.propTypes = {
   name: PropTypes.string,
   status: PropTypes.string,
-  percent: PropTypes.float,
+  percent: PropTypes.number,
   size: PropTypes.string,
   speed: PropTypes.string,
   timeRemaining: PropTypes.string,

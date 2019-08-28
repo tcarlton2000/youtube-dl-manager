@@ -12,7 +12,7 @@ test('should render download name and status', () => {
       percent={50.5}
       size={'23MiB'}
       speed={'1.23MiB/s'}
-      time_remaining={'01:34'}
+      timeRemaining={'01:34'}
     />,
   );
 

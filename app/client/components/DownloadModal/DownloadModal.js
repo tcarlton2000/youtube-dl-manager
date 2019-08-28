@@ -106,9 +106,9 @@ export const DownloadModalModel = ({
 };
 
 DownloadModalModel.propTypes = {
-  setUrl: PropTypes.function,
-  setDirectory: PropTypes.function,
+  setUrl: PropTypes.func,
+  setDirectory: PropTypes.func,
   url: PropTypes.string,
   directory: PropTypes.string,
-  submit: PropTypes.function,
+  submit: PropTypes.func,
 };
