@@ -1,3 +1,3 @@
-import { DownloadList } from './DownloadList'
+import { DownloadList } from './DownloadList';
 
-export default DownloadList
+export default DownloadList;

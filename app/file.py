@@ -72,7 +72,7 @@ class File(db.Model):
             "percent": self.percent,
             "size": self.size,
             "speed": self.speed,
-            "time_remaining": self.time_remaining,
+            "timeRemaining": self.time_remaining,
         }
 
     def marshal(self):
@@ -85,6 +85,6 @@ class File(db.Model):
             "percent": self.percent,
             "size": self.size,
             "speed": self.speed,
-            "time_remaining": self.time_remaining,
+            "timeRemaining": self.time_remaining,
             "log": self.log,
         }

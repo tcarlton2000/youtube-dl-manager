@@ -43,7 +43,7 @@ def test_download_file():
     assert get_resp.get_json()["name"] in possible_download_names
     assert get_resp.get_json()["directory"] == "."
     assert get_resp.get_json()["percent"] == 100.0
-    assert get_resp.get_json()["time_remaining"] == "00:00"
+    assert get_resp.get_json()["timeRemaining"] == "00:00"
     assert get_resp.get_json()["size"] != ""
     assert get_resp.get_json()["speed"] != ""
 

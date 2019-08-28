@@ -1,3 +1,4 @@
 export default () => {
-    return window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
-}
+  const host = window.location.protocol + '//' + window.location.hostname;
+  return host + ':' + window.location.port;
+};
