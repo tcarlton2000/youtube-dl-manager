@@ -1,5 +1,5 @@
-import getHost from './getHost'
+import getHost from './getHost';
 
-export default (route) => {
-    return getHost() + route;
-}
+export default route => {
+  return getHost() + route;
+};

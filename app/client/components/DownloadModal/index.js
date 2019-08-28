@@ -1,3 +1,3 @@
-import { DownloadModal } from './DownloadModal'
+import { DownloadModal } from './DownloadModal';
 
-export default DownloadModal
+export default DownloadModal;
