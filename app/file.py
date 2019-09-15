@@ -52,7 +52,8 @@ class File(db.Model):
                 self.name = name_re.group(1)
 
         status_re = re.search(
-            r"(\d+\.\d+)%\s+of\s+(\d+\.\d+\w+)\s+at\s+(\d+\.\d+.+)\s+ETA\s+(\d+:\d+)",
+            r"(\d+\.\d+)%\s+of\s+(\d+\.\d+\w+)\s"
+            r"+at\s+(\d+\.\d+.+)\s+ETA\s+((\d+:)?\d+:\d+)",
             line,
         )
         if status_re:
