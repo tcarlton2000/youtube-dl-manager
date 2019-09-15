@@ -27,11 +27,10 @@ export const DownloadListProvider = () => {
       getDownloads(activePage);
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activePage]);
 
   const handlePageChange = (e, value) => {
     setActivePage(value.activePage);
-    getDownloads(value.activePage);
   };
 
   return (
