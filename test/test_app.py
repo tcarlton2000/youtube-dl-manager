@@ -1,7 +1,9 @@
 import json
 import os
+import pytest
 
 from app import youtube
+from test.db_mock import mock_db_calls
 
 youtube.app.config["TESTING"] = True
 youtube.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -25,7 +27,7 @@ def test_download_file():
         content_type="application/json",
     )
 
-    assert resp.status == "201 CREATED"
+    assert resp.status == "201 CREATED", resp.get_json()
     assert resp.mimetype == "application/json"
     assert "id" in resp.get_json()
     _id = resp.json["id"]
@@ -53,14 +55,47 @@ def test_download_file():
 
 def test_get_download_list():
     resp = client.get("/downloads")
-    assert resp.status == "200 OK"
+    assert resp.status == "200 OK", resp.get_json()
     assert resp.mimetype == "application/json"
 
     json_resp = resp.get_json()
-    assert len(json_resp) > 0
+    assert "downloads" in json_resp
+    assert len(json_resp["downloads"]) > 0
 
-    urls = [item["url"] for item in json_resp]
+    urls = [item["url"] for item in json_resp["downloads"]]
     assert "https://www.youtube.com/watch?v=nTfCxORgKEk" in urls
+
+
+@pytest.mark.parametrize(
+    "page,limit,expected_limit,total_pages,status",
+    [
+        (1, None, 10, 2, "In Progress"),
+        (2, None, 10, 2, "Completed"),
+        (None, 5, 5, 4, "In Progress"),
+        ("cow", "pig", 10, 2, "In Progress"),
+    ],
+)
+def test_download_list_pagination(page, limit, expected_limit, total_pages, status):
+    total_count = 20
+    mock_db_calls(youtube.db, total_count)
+    if limit is None:
+        resp = client.get("downloads?page={}".format(page))
+    elif page is None:
+        resp = client.get("downloads?limit={}".format(limit))
+    else:
+        resp = client.get("downloads?page={}&limit={}".format(page, limit))
+
+    assert resp.status == "200 OK", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    json_resp = resp.get_json()
+    assert "downloads" in json_resp
+
+    assert len(json_resp["downloads"]) == expected_limit
+    assert all([download["status"] == status for download in json_resp["downloads"]])
+
+    assert "totalPages" in json_resp
+    assert json_resp["totalPages"] == total_pages
 
 
 def test_get_download_not_found():
@@ -70,6 +105,6 @@ def test_get_download_not_found():
 
 def test_index():
     resp = client.get("/")
-    assert resp.status == "200 OK"
+    assert resp.status == "200 OK", resp.get_json()
     assert resp.mimetype == "text/html"
     assert "<html>" in str(resp.get_data())

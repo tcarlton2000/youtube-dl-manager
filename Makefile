@@ -16,7 +16,7 @@ format:
 	npm run format
 
 unittest:
-	PYTHONPATH=${PWD} pipenv run py.test -v test/ --cov=app/ --cov-report term-missing --cov-fail-under 90
+	PYTHONPATH=${PWD} pipenv run py.test -vv test/ --cov=app/ --cov-report term-missing --cov-fail-under 90
 	make clean
 	npm test
 

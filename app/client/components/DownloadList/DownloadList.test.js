@@ -1,31 +1,34 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import 'isomorphic-fetch';
 import DownloadList from '../DownloadList';
 
 test('should fetch and render download list', async () => {
-  const fakeDownloadList = [
-    {
-      id: 0,
-      name: 'Download One',
-      status: 'In Progress',
-      percent: 50.0,
-      size: '30.6MiB',
-      speed: '100KiB/s',
-      timeRemaining: '00:38',
-    },
-    {
-      id: 1,
-      name: 'Download Two',
-      status: 'Completed',
-      percent: 100.0,
-      size: '52.8MiB',
-      speed: '0KiB/s',
-      timeRemaining: '00:00',
-    },
-  ];
+  const fakeDownloadList = {
+    downloads: [
+      {
+        id: 0,
+        name: 'Download One',
+        status: 'In Progress',
+        percent: 50.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+      {
+        id: 1,
+        name: 'Download Two',
+        status: 'Completed',
+        percent: 100.0,
+        size: '52.8MiB',
+        speed: '0KiB/s',
+        timeRemaining: '00:00',
+      },
+    ],
+    totalPages: 1,
+  };
 
   jest.spyOn(global, 'fetch').mockImplementation(() => {
     return Promise.resolve({
@@ -64,4 +67,76 @@ test('should fetch and render download list', async () => {
 
   const secondDownloadTimeRemaining = await findByText('00:00');
   expect(secondDownloadTimeRemaining).toBeInTheDocument();
+});
+
+test('should load specific page when pagination link clicked on', async () => {
+  const pageOneFakeDownloadList = {
+    downloads: [
+      {
+        id: 0,
+        name: 'Download One',
+        status: 'In Progress',
+        percent: 50.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+      {
+        id: 1,
+        name: 'Download Two',
+        status: 'Completed',
+        percent: 100.0,
+        size: '52.8MiB',
+        speed: '0KiB/s',
+        timeRemaining: '00:00',
+      },
+    ],
+    totalPages: 2,
+  };
+  const pageTwoFakeDownloadList = {
+    downloads: [
+      {
+        id: 2,
+        name: 'Download Three',
+        status: 'In Progress',
+        percent: 50.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+      {
+        id: 3,
+        name: 'Download Four',
+        status: 'Completed',
+        percent: 100.0,
+        size: '52.8MiB',
+        speed: '0KiB/s',
+        timeRemaining: '00:00',
+      },
+    ],
+    totalPages: 2,
+  };
+
+  jest.spyOn(global, 'fetch').mockImplementation(url => {
+    if (url.includes('2')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(pageTwoFakeDownloadList),
+      });
+    }
+
+    return Promise.resolve({
+      json: () => Promise.resolve(pageOneFakeDownloadList),
+    });
+  });
+
+  const { findByText } = render(<DownloadList />);
+
+  const firstPageDownloadText = await findByText('Download One');
+  expect(firstPageDownloadText).toBeInTheDocument();
+
+  const pageTwoButton = await findByText('2');
+  fireEvent.click(pageTwoButton);
+
+  const secondPageDownloadText = await findByText('Download Three');
+  expect(secondPageDownloadText).toBeInTheDocument();
 });

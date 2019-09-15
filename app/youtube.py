@@ -25,7 +25,9 @@ def downloads():
         resp = start_download(body["url"], body.get("directory", None))
         return json_response(resp, 201)
     else:
-        files = File.get_all_files()
+        files = File.get_all_files(
+            page=request.args.get("page", None), limit=request.args.get("limit", None)
+        )
         return json_response(files, 200)
 
 
