@@ -1,5 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
+import { number } from '@storybook/addon-knobs';
 import { DownloadListModel } from './DownloadList';
 
 const downloads = [
@@ -24,5 +25,12 @@ const downloads = [
 ];
 
 storiesOf('DownloadList', module)
-  .add('display list', () => <DownloadListModel downloads={downloads} />)
+  .add('display list', () => (
+    <DownloadListModel
+      downloads={downloads}
+      activePage={number('activePage', 1)}
+      totalPages={number('totalPages', 5)}
+      handlePageChange={() => {}}
+    />
+  ))
   .add('loading', () => <DownloadListModel downloads={null} />);

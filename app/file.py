@@ -1,6 +1,10 @@
+import math
 import re
 
 from app.main import db
+
+INITIAL_PAGE = 1
+DEFAULT_LIMIT = 10
 
 
 class File(db.Model):
@@ -16,9 +20,14 @@ class File(db.Model):
     time_remaining = db.Column(db.String)
 
     @classmethod
-    def get_all_files(cls):
-        query = File.query.order_by(File.id.desc()).all()
-        return [item.list_marshal() for item in query]
+    def get_all_files(cls, page=None, limit=None):
+        page = int(page) if page is not None and page.isdigit() else INITIAL_PAGE
+        limit = int(limit) if limit is not None and limit.isdigit() else DEFAULT_LIMIT
+        query = File.query.order_by(File.id.desc()).paginate(page, limit, False).items
+        return {
+            "downloads": [item.list_marshal() for item in query],
+            "totalPages": File.total_pages(limit),
+        }
 
     @classmethod
     def get_file(cls, file_id):
@@ -74,6 +83,11 @@ class File(db.Model):
             "speed": self.speed,
             "timeRemaining": self.time_remaining,
         }
+
+    @staticmethod
+    def total_pages(limit):
+        total_count = db.session.query(db.func.count(File.id)).scalar()
+        return math.ceil(total_count / limit) or 1
 
     def marshal(self):
         return {
