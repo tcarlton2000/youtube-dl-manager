@@ -3,7 +3,7 @@ import os
 import pytest
 
 from app import youtube
-from test.db_mock import mock_db_calls
+from test.db_mock import create_new_file, mock_db_calls
 
 youtube.app.config["TESTING"] = True
 youtube.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -101,6 +101,27 @@ def test_download_list_pagination(page, limit, expected_limit, total_pages, stat
 def test_get_download_not_found():
     resp = client.get("/downloads/9999")
     assert resp.status == "404 NOT FOUND"
+
+
+@pytest.mark.parametrize(
+    "log,field,value",
+    [
+        ("34.7% of 102.16MiB at 144.30KiB/s ETA 07:53", "percent", 34.7),
+        ("34.7% of 102.16MiB at 144.30KiB/s ETA 07:53", "size", "102.16MiB"),
+        ("34.7% of 102.16MiB at 144.30KiB/s ETA 07:53", "speed", "144.30KiB/s"),
+        ("34.7% of 102.16MiB at 144.30KiB/s ETA 07:53", "time_remaining", "07:53"),
+        (
+            "34.7% of 102.16MiB at 144.30KiB/s ETA 01:07:53",
+            "time_remaining",
+            "01:07:53",
+        ),
+    ],
+)
+def test_log_parsing(log, field, value):
+    file = create_new_file(youtube.db)
+    file.add_to_log(log)
+
+    assert getattr(file, field) == value
 
 
 def test_index():
