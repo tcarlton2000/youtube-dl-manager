@@ -20,7 +20,7 @@ test('should fetch and render download list', async () => {
       {
         id: 1,
         name: 'Download Two',
-        status: 'Completed',
+        status: 'In Progress',
         percent: 100.0,
         size: '52.8MiB',
         speed: '0KiB/s',
@@ -84,7 +84,7 @@ test('should load specific page when pagination link clicked on', async () => {
       {
         id: 1,
         name: 'Download Two',
-        status: 'Completed',
+        status: 'In Progress',
         percent: 100.0,
         size: '52.8MiB',
         speed: '0KiB/s',
@@ -107,7 +107,7 @@ test('should load specific page when pagination link clicked on', async () => {
       {
         id: 3,
         name: 'Download Four',
-        status: 'Completed',
+        status: 'In Progress',
         percent: 100.0,
         size: '52.8MiB',
         speed: '0KiB/s',
