@@ -48,23 +48,35 @@ Download.propTypes = {
 
 const DownloadNameAndStatus = ({ name, status }) => {
   return (
-    <Grid.Row columns={2}>
-      <Grid.Column width={14}>
-        <h4>{name}</h4>
-        <p />
-      </Grid.Column>
-      <Grid.Column width={2} align="right">
-        {status === DOWNLOAD_ERROR ? <Label color="red">ERROR</Label> : ''}
-        {status === DOWNLOAD_IN_PROGRESS ? (
-          <Label color="yellow">IN PROGRESS</Label>
-        ) : (
-          ''
-        )}
-        {status === DOWNLOAD_COMPLETED ? (
-          <Label color="green">COMPLETED</Label>
-        ) : (
-          ''
-        )}
+    <Grid.Row columns={1}>
+      <Grid.Column>
+        <table width="100%">
+          <tbody>
+            <tr>
+              <td>
+                <h4>{name}</h4>
+                <p />
+              </td>
+              <td width="100px">
+                {status === DOWNLOAD_ERROR ? (
+                  <Label color="red">ERROR</Label>
+                ) : (
+                  ''
+                )}
+                {status === DOWNLOAD_IN_PROGRESS ? (
+                  <Label color="yellow">IN PROGRESS</Label>
+                ) : (
+                  ''
+                )}
+                {status === DOWNLOAD_COMPLETED ? (
+                  <Label color="green">COMPLETED</Label>
+                ) : (
+                  ''
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </Grid.Column>
     </Grid.Row>
   );
