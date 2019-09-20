@@ -117,11 +117,28 @@ def test_get_download_not_found():
         ),
     ],
 )
-def test_log_parsing(log, field, value):
+def test_stat_parsing(log, field, value):
     file = create_new_file(youtube.db)
     file.add_to_log(log)
 
     assert getattr(file, field) == value
+
+
+@pytest.mark.parametrize(
+    "log,name",
+    [
+        ("[download] Destination: New Video.mp4", "New Video.mp4"),
+        (
+            "[download] Duplicate Video.mkv has already been downloaded and merged",
+            "Duplicate Video.mkv",
+        ),
+    ],
+)
+def test_name_parsing(log, name):
+    file = create_new_file(youtube.db, name=None)
+    file.add_to_log(log)
+
+    assert file.name == name
 
 
 def test_index():
