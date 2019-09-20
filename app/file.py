@@ -45,12 +45,22 @@ class File(db.Model):
 
     def add_to_log(self, line):
         self.log += line
+        self.parse_name(line)
+        self.parse_stats(line)
+        db.session.commit()
 
+    def parse_name(self, line):
         if self.name is None:
-            name_re = re.search(r"Destination: (.*)", line)
-            if name_re:
-                self.name = name_re.group(1)
+            starting_name_re = re.search(r"Destination: (.*)", line)
+            completed_name_re = re.search(
+                r"\[download\] (.*) has already been downloaded and merged", line
+            )
+            if starting_name_re:
+                self.name = starting_name_re.group(1)
+            elif completed_name_re:
+                self.name = completed_name_re.group(1)
 
+    def parse_stats(self, line):
         status_re = re.search(
             r"(\d+\.\d+)%\s+of\s+(\d+\.\d+\w+)\s"
             r"+at\s+(\d+\.\d+.+)\s+ETA\s+((\d+:)?\d+:\d+)",
@@ -61,8 +71,6 @@ class File(db.Model):
             self.size = status_re.group(2)
             self.speed = status_re.group(3)
             self.time_remaining = status_re.group(4)
-
-        db.session.commit()
 
     def complete(self):
         self.status = "Completed"
