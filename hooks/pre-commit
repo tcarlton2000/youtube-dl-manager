@@ -1,1 +1,1 @@
-make format lint
+make lint

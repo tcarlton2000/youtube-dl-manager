@@ -8,6 +8,7 @@
   },
   "scripts": {
     "preinstall": "git config core.hooksPath hooks",
+    "build": "webpack",
     "dev": "webpack --mode development",
     "start": "webpack --mode development --watch",
     "test": "jest",
