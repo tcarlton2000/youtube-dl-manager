@@ -67,9 +67,13 @@ export const DownloadListModel = ({
         </Segment.Group>
         <div align="center">
           <Pagination
+            firstItem={null}
+            lastItem={null}
             activePage={activePage}
             onPageChange={handlePageChange}
             totalPages={totalPages}
+            siblingRange={1}
+            boundaryRange={0}
           />
         </div>
       </div>
