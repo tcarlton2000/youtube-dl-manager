@@ -22,7 +22,7 @@ RUN npm install
 WORKDIR .
 COPY ./app /app/app
 WORKDIR /app
-RUN npm run dev
+RUN npm run build
 
 ENV PYTHONPATH /app
 CMD ["pipenv", "run", "python", "app/youtube.py"]
