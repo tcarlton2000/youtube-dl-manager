@@ -140,3 +140,111 @@ test('should load specific page when pagination link clicked on', async () => {
   const secondPageDownloadText = await findByText('Download Three');
   expect(secondPageDownloadText).toBeInTheDocument();
 });
+
+test('should load specific status when status filter clicked on', async () => {
+  const pageOneInProgressDownloadList = {
+    downloads: [
+      {
+        id: 1,
+        name: 'Download One',
+        status: 'In Progress',
+        percent: 50.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+    ],
+    totalPages: 2,
+  };
+  const pageOneCompletedDownloadList = {
+    downloads: [
+      {
+        id: 3,
+        name: 'Download Three',
+        status: 'Completed',
+        percent: 100.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+    ],
+    totalPages: 2,
+  };
+  const pageTwoInProgressDownloadList = {
+    downloads: [
+      {
+        id: 2,
+        name: 'Download Two',
+        status: 'In Progress',
+        percent: 50.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+    ],
+    totalPages: 2,
+  };
+  const pageTwoCompletedDownloadList = {
+    downloads: [
+      {
+        id: 4,
+        name: 'Download Four',
+        status: 'Completed',
+        percent: 100.0,
+        size: '30.6MiB',
+        speed: '100KiB/s',
+        timeRemaining: '00:38',
+      },
+    ],
+    totalPages: 2,
+  };
+
+  jest.spyOn(global, 'fetch').mockImplementation(url => {
+    if (url.includes('Completed,Error') && url.includes('1')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(pageOneCompletedDownloadList),
+      });
+    } else if (url.includes('Completed,Error') && url.includes('2')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(pageTwoCompletedDownloadList),
+      });
+    } else if (url.includes('In Progress') && url.includes('2')) {
+      return Promise.resolve({
+        json: () => Promise.resolve(pageTwoInProgressDownloadList),
+      });
+    }
+
+    return Promise.resolve({
+      json: () => Promise.resolve(pageOneInProgressDownloadList),
+    });
+  });
+
+  const { findByText } = render(<DownloadList />);
+
+  const firstPageInProgressDownloadText = await findByText('IN PROGRESS');
+  expect(firstPageInProgressDownloadText).toBeInTheDocument();
+  const firstPageInProgressDownloadNameText = await findByText('Download One');
+  expect(firstPageInProgressDownloadNameText).toBeInTheDocument();
+
+  const completedButton = await findByText('Completed Error');
+  fireEvent.click(completedButton);
+
+  const firstPageCompletedDownloadText = await findByText('COMPLETED');
+  expect(firstPageCompletedDownloadText).toBeInTheDocument();
+  const firstPageCompletedDownloadNameText = await findByText('Download Three');
+  expect(firstPageCompletedDownloadNameText).toBeInTheDocument();
+
+  const secondPageButton = await findByText('2');
+  fireEvent.click(secondPageButton);
+
+  const secondPageCompletedDownloadNameText = await findByText('Download Four');
+  expect(secondPageCompletedDownloadNameText).toBeInTheDocument();
+
+  const inProgressButton = await findByText('In Progress');
+  fireEvent.click(inProgressButton);
+
+  const secondPageInProgressDownloadText = await findByText('IN PROGRESS');
+  expect(secondPageInProgressDownloadText).toBeInTheDocument();
+  const secondPageInProgressDownloadNameText = await findByText('Download One');
+  expect(secondPageInProgressDownloadNameText).toBeInTheDocument();
+});

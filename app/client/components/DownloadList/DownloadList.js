@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
 import Download from 'Components/Download';
-import { Segment, Loader, Dimmer, Pagination } from 'semantic-ui-react';
+import { Segment, Loader, Dimmer, Pagination, Menu } from 'semantic-ui-react';
 import getRoute from 'Utils/getRoute';
+
+const IN_PROGRESS_STATUS = 'In Progress';
+const COMPLETED_STATUS = 'Completed,Error';
 
 export const DownloadListProvider = () => {
   const [downloads, setDownloads] = useState(null);
   const [activePage, setActivePage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [statusFilter, setStatusFilter] = useState(IN_PROGRESS_STATUS);
 
-  const getDownloads = pageNumber => {
-    fetch(getRoute('/downloads?page=' + pageNumber))
+  const getDownloads = (pageNumber, status) => {
+    fetch(getRoute('/downloads?page=' + pageNumber + '&status=' + status))
       .then(response => response.json())
       .then(responseJson => {
         setDownloads(responseJson.downloads);
@@ -22,15 +26,20 @@ export const DownloadListProvider = () => {
   };
 
   useEffect(() => {
-    getDownloads(activePage);
+    getDownloads(activePage, statusFilter);
     const interval = setInterval(() => {
-      getDownloads(activePage);
+      getDownloads(activePage, statusFilter);
     }, 1000);
     return () => clearInterval(interval);
-  }, [activePage]);
+  }, [activePage, statusFilter]);
 
   const handlePageChange = (e, value) => {
     setActivePage(value.activePage);
+  };
+
+  const handleStatusChange = (e, value) => {
+    setStatusFilter(value.name);
+    setActivePage(1);
   };
 
   return (
@@ -39,6 +48,8 @@ export const DownloadListProvider = () => {
       activePage={activePage}
       totalPages={totalPages}
       handlePageChange={handlePageChange}
+      statusFilter={statusFilter}
+      handleStatusChange={handleStatusChange}
     />
   );
 };
@@ -48,10 +59,24 @@ export const DownloadListModel = ({
   activePage,
   totalPages,
   handlePageChange,
+  statusFilter,
+  handleStatusChange,
 }) => {
   if (downloads !== null) {
     return (
       <div>
+        <Menu pointing secondary>
+          <Menu.Item
+            name={IN_PROGRESS_STATUS}
+            active={statusFilter === IN_PROGRESS_STATUS}
+            onClick={handleStatusChange}
+          />
+          <Menu.Item
+            name={COMPLETED_STATUS}
+            active={statusFilter === COMPLETED_STATUS}
+            onClick={handleStatusChange}
+          />
+        </Menu>
         <Segment.Group raised>
           {downloads.map(item => (
             <Download
