@@ -98,6 +98,25 @@ def test_download_list_pagination(page, limit, expected_limit, total_pages, stat
     assert json_resp["totalPages"] == total_pages
 
 
+@pytest.mark.parametrize("filters", [["In Progress"], ["Completed", "Error"]])
+def test_download_list_status_filter(filters):
+    total_count = 10
+    mock_db_calls(youtube.db, total_count)
+
+    param = ",".join(filters)
+
+    resp = client.get("downloads?status={}".format(param))
+
+    assert resp.status == "200 OK", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    json_resp = resp.get_json()
+    assert "downloads" in json_resp
+
+    assert len(json_resp["downloads"]) == 5
+    assert all(download["status"] in filters for download in json_resp["downloads"])
+
+
 def test_get_download_not_found():
     resp = client.get("/downloads/9999")
     assert resp.status == "404 NOT FOUND"

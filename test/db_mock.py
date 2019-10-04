@@ -8,9 +8,9 @@ def reset_db(db):
 
 def mock_db_calls(db, count):
     reset_db(db)
-    for status in ["Completed", "In Progress"]:
+    for status_id in [2, 1]:
         for i in range(int(count / 2)):
-            create_new_file(db, name="Downloads {}".format(i), status=status)
+            create_new_file(db, name="Downloads {}".format(i), status_id=status_id)
 
 
 def create_new_file(
@@ -18,12 +18,17 @@ def create_new_file(
     name="Filename",
     directory="/downloads",
     url="http://url.com",
-    status="In Progress",
+    status_id=1,
     log="",
     percent=50.0,
 ):
     file = File(
-        name=name, directory=directory, url=url, status=status, log=log, percent=percent
+        name=name,
+        directory=directory,
+        url=url,
+        status_id=status_id,
+        log=log,
+        percent=percent,
     )
     db.session.add(file)
     return file

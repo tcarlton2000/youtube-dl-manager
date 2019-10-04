@@ -2,6 +2,7 @@ import math
 import re
 
 from app.main import db
+from app.status import Status
 
 INITIAL_PAGE = 1
 DEFAULT_LIMIT = 10
@@ -12,7 +13,9 @@ class File(db.Model):
     name = db.Column(db.String)
     directory = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
-    status = db.Column(db.String, nullable=False)
+    status_id = db.Column(
+        db.Integer, db.ForeignKey("status.id"), nullable=False, index=True
+    )
     log = db.Column(db.String, nullable=False)
     size = db.Column(db.String)
     speed = db.Column(db.String)
@@ -20,13 +23,16 @@ class File(db.Model):
     time_remaining = db.Column(db.String)
 
     @classmethod
-    def get_all_files(cls, page=None, limit=None):
+    def get_all_files(cls, status=None, page=None, limit=None):
         page = int(page) if page is not None and page.isdigit() else INITIAL_PAGE
         limit = int(limit) if limit is not None and limit.isdigit() else DEFAULT_LIMIT
-        query = File.query.order_by(File.id.desc()).paginate(page, limit, False).items
+
+        query = File.filter_status(File.query, status)
+        query = query.order_by(File.id.desc()).paginate(page, limit, False).items
+
         return {
             "downloads": [item.list_marshal() for item in query],
-            "totalPages": File.total_pages(limit),
+            "totalPages": File.total_pages(status, limit),
         }
 
     @classmethod
@@ -37,7 +43,11 @@ class File(db.Model):
     @classmethod
     def new_file(cls, url, directory):
         new_file = File(
-            url=url, directory=directory, status="In Progress", log="", percent=0.0
+            url=url,
+            directory=directory,
+            status_id=Status.STATUS_IN_PROGRESS_ID,
+            log="",
+            percent=0.0,
         )
         db.session.add(new_file)
         db.session.commit()
@@ -73,11 +83,11 @@ class File(db.Model):
             self.time_remaining = status_re.group(4)
 
     def complete(self):
-        self.status = "Completed"
+        self.status_id = Status.STATUS_COMPLETED_ID
         db.session.commit()
 
     def error(self):
-        self.status = "Error"
+        self.status_id = Status.STATUS_ERROR_ID
         db.session.commit()
 
     def list_marshal(self):
@@ -86,7 +96,7 @@ class File(db.Model):
             "name": self.name,
             "url": self.url,
             "directory": self.directory,
-            "status": self.status,
+            "status": Status.id_to_name(self.status_id),
             "percent": self.percent,
             "size": self.size,
             "speed": self.speed,
@@ -94,8 +104,20 @@ class File(db.Model):
         }
 
     @staticmethod
-    def total_pages(limit):
-        total_count = db.session.query(db.func.count(File.id)).scalar()
+    def filter_status(query, status):
+        if status is None:
+            return query
+        elif isinstance(status, list):
+            status_ids = [Status.name_to_id(item) for item in status]
+            return query.filter(File.status_id.in_(status_ids))
+        else:
+            return query.filter(File.status_id == Status.name_to_id(status))
+
+    @staticmethod
+    def total_pages(status, limit):
+        total_count = File.filter_status(
+            db.session.query(db.func.count(File.id)), status
+        ).scalar()
         return math.ceil(total_count / limit) or 1
 
     def marshal(self):
@@ -104,7 +126,7 @@ class File(db.Model):
             "name": self.name,
             "url": self.url,
             "directory": self.directory,
-            "status": self.status,
+            "status": Status.id_to_name(self.status_id),
             "percent": self.percent,
             "size": self.size,
             "speed": self.speed,
