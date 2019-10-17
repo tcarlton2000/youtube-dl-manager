@@ -4,6 +4,7 @@ import threading
 from time import sleep
 
 from app.file import File
+from app.settings import Settings
 
 
 class Download(threading.Thread):
@@ -15,7 +16,7 @@ class Download(threading.Thread):
 
     def run(self):
         cmd = "youtube-dl --no-mtime {}".format(self.url)
-        cwd = self.directory or "/downloads"
+        cwd = self.directory or Settings.get_setting("downloadDirectory")
         p = subprocess.Popen(
             cmd.split(),
             cwd=cwd,

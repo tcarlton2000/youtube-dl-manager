@@ -16,7 +16,7 @@ export const DownloadModal = () => {
   };
 
   const submit = () => {
-    fetch(getRoute('/downloads'), {
+    fetch(getRoute('/api/downloads'), {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -73,35 +73,33 @@ export const DownloadModalModel = ({
   };
 
   return (
-    <div align="right">
-      <Modal
-        open={showModal}
-        onClose={closeModal}
-        trigger={<Button onClick={openModal}>New Download...</Button>}
-      >
-        <Modal.Header>New Download</Modal.Header>
-        <Modal.Content>
-          <Form>
-            <Form.Field>
-              <label>URL</label>
-              <input onChange={setUrl} value={url} />
-            </Form.Field>
-            <Form.Field>
-              <label>Directory</label>
-              <input onChange={setDirectory} value={directory} />
-            </Form.Field>
-          </Form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button primary onClick={downloadClicked}>
-            Download
-          </Button>
-          <Button secondary onClick={closeModal}>
-            Cancel
-          </Button>
-        </Modal.Actions>
-      </Modal>
-    </div>
+    <Modal
+      open={showModal}
+      onClose={closeModal}
+      trigger={<Button onClick={openModal}>New Download...</Button>}
+    >
+      <Modal.Header>New Download</Modal.Header>
+      <Modal.Content>
+        <Form>
+          <Form.Field>
+            <label>URL</label>
+            <input onChange={setUrl} value={url} />
+          </Form.Field>
+          <Form.Field>
+            <label>Directory</label>
+            <input onChange={setDirectory} value={directory} />
+          </Form.Field>
+        </Form>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button primary onClick={downloadClicked}>
+          Download
+        </Button>
+        <Button secondary onClick={closeModal}>
+          Cancel
+        </Button>
+      </Modal.Actions>
+    </Modal>
   );
 };
 

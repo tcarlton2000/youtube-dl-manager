@@ -1,8 +1,10 @@
 from app.file import File
+from app.settings import Settings
 
 
 def reset_db(db):
     db.session.query(File).delete()
+    db.session.query(Settings).delete()
     db.session.commit()
 
 
@@ -32,3 +34,10 @@ def create_new_file(
     )
     db.session.add(file)
     return file
+
+
+def create_new_setting(db, key, value):
+    setting = Settings(key=key, value=value)
+    db.session.add(setting)
+    db.session.commit()
+    return setting

@@ -2,8 +2,12 @@ import json
 import os
 import pytest
 
+from unittest.mock import patch, MagicMock
+
 from app import youtube
-from test.db_mock import create_new_file, mock_db_calls
+from app.settings import Settings
+from app.download import subprocess
+from test.db_mock import create_new_file, create_new_setting, mock_db_calls, reset_db
 
 youtube.app.config["TESTING"] = True
 youtube.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
@@ -20,7 +24,7 @@ possible_download_names = [
 
 def test_download_file():
     resp = client.post(
-        "/downloads",
+        "/api/downloads",
         data=json.dumps(
             {"url": "https://www.youtube.com/watch?v=nTfCxORgKEk", "directory": "."}
         ),
@@ -32,13 +36,13 @@ def test_download_file():
     assert "id" in resp.get_json()
     _id = resp.json["id"]
 
-    get_resp = client.get("/downloads/{}".format(_id))
+    get_resp = client.get("/api/downloads/{}".format(_id))
     prev_percent = 0.0
     while get_resp.get_json()["status"] != "Completed":
         assert get_resp.get_json()["status"] != "Error"
         assert get_resp.get_json()["percent"] >= prev_percent
         prev_percent = get_resp.get_json()["percent"]
-        get_resp = client.get("/downloads/{}".format(_id))
+        get_resp = client.get("/api/downloads/{}".format(_id))
 
     print(get_resp.get_json())
 
@@ -54,7 +58,7 @@ def test_download_file():
 
 
 def test_get_download_list():
-    resp = client.get("/downloads")
+    resp = client.get("/api/downloads")
     assert resp.status == "200 OK", resp.get_json()
     assert resp.mimetype == "application/json"
 
@@ -79,11 +83,11 @@ def test_download_list_pagination(page, limit, expected_limit, total_pages, stat
     total_count = 20
     mock_db_calls(youtube.db, total_count)
     if limit is None:
-        resp = client.get("downloads?page={}".format(page))
+        resp = client.get("/api/downloads?page={}".format(page))
     elif page is None:
-        resp = client.get("downloads?limit={}".format(limit))
+        resp = client.get("/api/downloads?limit={}".format(limit))
     else:
-        resp = client.get("downloads?page={}&limit={}".format(page, limit))
+        resp = client.get("/api/downloads?page={}&limit={}".format(page, limit))
 
     assert resp.status == "200 OK", resp.get_json()
     assert resp.mimetype == "application/json"
@@ -105,7 +109,7 @@ def test_download_list_status_filter(filters):
 
     param = ",".join(filters)
 
-    resp = client.get("downloads?status={}".format(param))
+    resp = client.get("/api/downloads?status={}".format(param))
 
     assert resp.status == "200 OK", resp.get_json()
     assert resp.mimetype == "application/json"
@@ -118,7 +122,7 @@ def test_download_list_status_filter(filters):
 
 
 def test_get_download_not_found():
-    resp = client.get("/downloads/9999")
+    resp = client.get("/api/downloads/9999")
     assert resp.status == "404 NOT FOUND"
 
 
@@ -158,6 +162,91 @@ def test_name_parsing(log, name):
     file.add_to_log(log)
 
     assert file.name == name
+
+
+def test_get_settings_loads_db_settings():
+    reset_db(youtube.db)
+    create_new_setting(youtube.db, "downloadDirectory", "/testing")
+    resp = client.get("/api/settings")
+
+    assert resp.status == "200 OK", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    assert resp.get_json() == {"settings": {"downloadDirectory": "/testing"}}
+
+
+def test_get_settings_loads_missing_settings():
+    reset_db(youtube.db)
+    resp = client.get("/api/settings")
+
+    assert resp.status == "200 OK", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    assert resp.get_json() == {"settings": {"downloadDirectory": "/downloads"}}
+
+
+def test_create_new_setting():
+    reset_db(youtube.db)
+    resp = client.post(
+        "/api/settings",
+        data=json.dumps({"settings": {"downloadDirectory": "/changed"}}),
+        content_type="application/json",
+    )
+
+    assert resp.status == "201 CREATED", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    setting = (
+        youtube.db.session.query(Settings)
+        .filter(Settings.key == "downloadDirectory")
+        .first()
+    )
+    assert setting is not None
+    assert setting.value == "/changed"
+
+
+def test_updating_existing_setting():
+    reset_db(youtube.db)
+    create_new_setting(youtube.db, key="downloadDirectory", value="/alreadyhere")
+    resp = client.post(
+        "/api/settings",
+        data=json.dumps({"settings": {"downloadDirectory": "/changed"}}),
+        content_type="application/json",
+    )
+
+    assert resp.status == "201 CREATED", resp.get_json()
+    assert resp.mimetype == "application/json"
+
+    setting = (
+        youtube.db.session.query(Settings)
+        .filter(Settings.key == "downloadDirectory")
+        .first()
+    )
+    assert setting is not None
+    assert setting.value == "/changed"
+
+
+def test_download_setting_in_database():
+    reset_db(youtube.db)
+    create_new_setting(youtube.db, key="downloadDirectory", value="/database")
+    popen_ret_val = MagicMock(
+        stdout=MagicMock(readline=MagicMock(return_value="")),
+        poll=MagicMock(return_value=0),
+    )
+    with patch.object(subprocess, "Popen", return_value=popen_ret_val) as popen_mock:
+        client.post(
+            "/api/downloads",
+            data=json.dumps({"url": "https://www.youtube.com/watch?v=nTfCxORgKEk"}),
+            content_type="application/json",
+        )
+
+        popen_mock.assert_called_with(
+            ["youtube-dl", "--no-mtime", "https://www.youtube.com/watch?v=nTfCxORgKEk"],
+            cwd="/database",
+            universal_newlines=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
 
 def test_index():
