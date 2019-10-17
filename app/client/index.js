@@ -1,18 +1,21 @@
 import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css';
 import './Compact.css';
-import DownloadList from 'Components/DownloadList';
-import DownloadModal from 'Components/DownloadModal';
+import MainPage from 'Components/MainPage';
+import SettingsPage from 'Components/SettingsPage';
 import { Container } from 'semantic-ui-react';
 
 const App = () => {
   return (
-    <Container margin={20}>
-      <h1>Youtube Download Manager</h1>
-      <DownloadModal />
-      <DownloadList />
-    </Container>
+    <Router>
+      <Container margin={20}>
+        <h1>Youtube Download Manager</h1>
+        <Route exact path="/" component={MainPage} />
+        <Route path="/settings" component={SettingsPage} />
+      </Container>
+    </Router>
   );
 };
 

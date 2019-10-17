@@ -14,7 +14,7 @@ export const DownloadListProvider = () => {
   const [statusFilter, setStatusFilter] = useState(IN_PROGRESS_STATUS);
 
   const getDownloads = (pageNumber, status) => {
-    fetch(getRoute('/downloads?page=' + pageNumber + '&status=' + status))
+    fetch(getRoute('/api/downloads?page=' + pageNumber + '&status=' + status))
       .then(response => response.json())
       .then(responseJson => {
         setDownloads(responseJson.downloads);

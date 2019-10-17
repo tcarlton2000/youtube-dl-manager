@@ -10,3 +10,8 @@
 .ui.compact.grid .column:not(:last-child), .ui.grid .compact.row .column:not(:last-child), .ui.grid .compact.column {
     padding-right: 0;
 }
+
+.settings {
+    color: inherit;
+    text-decoration: inherit;
+}

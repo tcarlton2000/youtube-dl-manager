@@ -6,6 +6,7 @@ from werkzeug.exceptions import NotFound
 from app import errors  # noqa: F401
 from app.download import Download
 from app.file import File
+from app.settings import Settings
 from app.main import app, db
 
 
@@ -13,31 +14,34 @@ def json_response(payload, status):
     return Response(json.dumps(payload), status=status, mimetype="application/json")
 
 
-@app.route("/")
-def index():
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def index(path):
     return render_template("index.html")
 
 
-@app.route("/downloads", methods=["GET", "POST"])
-def downloads():
-    if request.method == "POST":
-        body = request.json
-        resp = start_download(body["url"], body.get("directory", None))
-        return json_response(resp, 201)
-    else:
-        status = request.args.get("status", None)
-        if status is not None and "," in status:
-            status = status.split(",")
+@app.route("/api/downloads", methods=["GET"])
+def get_downloads():
+    status = request.args.get("status", None)
+    if status is not None and "," in status:
+        status = status.split(",")
 
-        files = File.get_all_files(
-            status=status,
-            page=request.args.get("page", None),
-            limit=request.args.get("limit", None),
-        )
-        return json_response(files, 200)
+    files = File.get_all_files(
+        status=status,
+        page=request.args.get("page", None),
+        limit=request.args.get("limit", None),
+    )
+    return json_response(files, 200)
 
 
-@app.route("/downloads/<int:file_id>")
+@app.route("/api/downloads", methods=["POST"])
+def new_download():
+    body = request.json
+    resp = start_download(body["url"], body.get("directory", None))
+    return json_response(resp, 201)
+
+
+@app.route("/api/downloads/<int:file_id>")
 def download(file_id):
     _file = File.get_file(file_id)
     if _file is None:
@@ -51,6 +55,18 @@ def start_download(url, directory):
     while download.id is None:
         pass
     return {"id": download.id}
+
+
+@app.route("/api/settings", methods=["GET"])
+def get_settings():
+    return json_response(Settings.get_settings(), 200)
+
+
+@app.route("/api/settings", methods=["POST"])
+def change_settings():
+    body = request.json
+    Settings.update_settings(body)
+    return json_response({}, 201)
 
 
 if __name__ == "__main__":
