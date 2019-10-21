@@ -4,25 +4,20 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import 'isomorphic-fetch';
 import { Settings } from './SettingsPage';
+import { defaultDownloadSettings } from 'Utils/mocks';
 
 afterEach(() => {
   jest.clearAllMocks();
 });
 
 test('should load settings from API and display', async () => {
-  const settingsMock = {
-    settings: {
-      downloadDirectory: '/downloads',
-    },
-  };
+  // GIVEN
+  defaultDownloadSettings();
 
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
-    return Promise.resolve({
-      json: () => Promise.resolve(settingsMock),
-    });
-  });
-
+  // WHEN
   const { findByDisplayValue, queryByText } = render(<Settings />);
+
+  // THEN
   const field = await findByDisplayValue('/downloads');
   expect(field).toBeInTheDocument();
 
@@ -31,18 +26,10 @@ test('should load settings from API and display', async () => {
 });
 
 test('should update and submit change', async () => {
-  const settingsMock = {
-    settings: {
-      downloadDirectory: '/downloads',
-    },
-  };
+  // GIVEN
+  defaultDownloadSettings();
 
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
-    return Promise.resolve({
-      json: () => Promise.resolve(settingsMock),
-    });
-  });
-
+  // WHEN
   const { findByLabelText, findByText } = render(<Settings />);
   const input = await findByLabelText('downloadDirectory');
   fireEvent.change(input, {
@@ -51,6 +38,7 @@ test('should update and submit change', async () => {
     },
   });
 
+  // THEN
   jest.spyOn(global, 'fetch').mockImplementation((url, init) => {
     expect(init.body).toBe(
       JSON.stringify({
@@ -73,20 +61,13 @@ test('should update and submit change', async () => {
 });
 
 test('should display error message on API failure', async () => {
-  const settingsMock = {
-    settings: {
-      downloadDirectory: '/downloads',
-    },
-  };
+  // GIVEN
+  defaultDownloadSettings();
 
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
-    return Promise.resolve({
-      json: () => Promise.resolve(settingsMock),
-    });
-  });
-
+  // WHEN
   const { queryByText, findByText } = render(<Settings />);
 
+  // THEN
   jest.spyOn(global, 'fetch').mockImplementation(() => {
     return Promise.resolve({
       ok: false,

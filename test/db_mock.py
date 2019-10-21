@@ -8,11 +8,17 @@ def reset_db(db):
     db.session.commit()
 
 
-def mock_db_calls(db, count):
+def create_file_list(db, in_progress_count=0, completed_count=0, error_count=0):
     reset_db(db)
-    for status_id in [2, 1]:
-        for i in range(int(count / 2)):
-            create_new_file(db, name="Downloads {}".format(i), status_id=status_id)
+
+    for i in range(error_count):
+        create_new_file(db, name=f"Error {i}", status_id=3)
+
+    for i in range(completed_count):
+        create_new_file(db, name=f"Completed {i}", status_id=2)
+
+    for i in range(in_progress_count):
+        create_new_file(db, name=f"In Progress {i}", status_id=1)
 
 
 def create_new_file(
