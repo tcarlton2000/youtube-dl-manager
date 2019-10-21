@@ -5,6 +5,7 @@ import { render } from '@testing-library/react';
 import Download from '../Download';
 
 test('should render download name, percent, and statistics for In Progress', () => {
+  // WHEN
   const { getByText } = render(
     <Download
       name={'Download Name'}
@@ -16,6 +17,7 @@ test('should render download name, percent, and statistics for In Progress', () 
     />,
   );
 
+  // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
   expect(getByText('IN PROGRESS')).toBeInTheDocument();
   expect(getByText('50%')).toBeInTheDocument();
@@ -25,6 +27,7 @@ test('should render download name, percent, and statistics for In Progress', () 
 });
 
 test('should render download name only for Completed', () => {
+  // WHEN
   const { getByText, queryByText } = render(
     <Download
       name={'Download Name'}
@@ -36,6 +39,7 @@ test('should render download name only for Completed', () => {
     />,
   );
 
+  // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
   expect(getByText('COMPLETED')).toBeInTheDocument();
   expect(queryByText('50%')).not.toBeInTheDocument();
@@ -45,6 +49,7 @@ test('should render download name only for Completed', () => {
 });
 
 test('should render download name only for Error', () => {
+  // WHEN
   const { getByText, queryByText } = render(
     <Download
       name={'Download Name'}
@@ -56,6 +61,7 @@ test('should render download name only for Error', () => {
     />,
   );
 
+  // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
   expect(getByText('ERROR')).toBeInTheDocument();
   expect(queryByText('50%')).not.toBeInTheDocument();
