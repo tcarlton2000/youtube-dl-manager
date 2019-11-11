@@ -14,6 +14,7 @@ v = {editable = true,version = "*"}
 Flask = "*"
 youtube_dl = "*"
 Flask-SQLAlchemy = "*"
+flask-compress = "*"
 
 [requires]
 python_version = "3.6"
