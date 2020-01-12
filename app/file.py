@@ -1,11 +1,27 @@
 import math
 import re
 
+from sqlalchemy.exc import OperationalError
+
 from app.main import db
 from app.status import Status
 
 INITIAL_PAGE = 1
 DEFAULT_LIMIT = 10
+
+
+def retry(func):
+    def do_retry(*args):
+        retry = True
+        while retry:
+            try:
+                output = func(*args)
+                retry = False
+            except OperationalError:
+                db.session.rollback()
+        return output
+
+    return do_retry
 
 
 class File(db.Model):
@@ -41,6 +57,7 @@ class File(db.Model):
         return query
 
     @classmethod
+    @retry
     def new_file(cls, url, directory):
         new_file = File(
             url=url,
@@ -53,6 +70,7 @@ class File(db.Model):
         db.session.commit()
         return new_file
 
+    @retry
     def add_to_log(self, line):
         self.log += line
         self.parse_name(line)
@@ -82,10 +100,12 @@ class File(db.Model):
             self.speed = status_re.group(3)
             self.time_remaining = status_re.group(4)
 
+    @retry
     def complete(self):
         self.status_id = Status.STATUS_COMPLETED_ID
         db.session.commit()
 
+    @retry
     def error(self):
         self.status_id = Status.STATUS_ERROR_ID
         db.session.commit()

@@ -130,9 +130,14 @@ export const pageTwoCompletedDownloadList = {
   totalPages: 2,
 };
 
+export const sleep = time => {
+  return new Promise(resolve => setTimeout(resolve, time));
+};
+
 export const downloadListMock = () => {
   jest.spyOn(global, 'fetch').mockImplementation(() => {
     return Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(downloadList),
     });
   });
@@ -142,11 +147,13 @@ export const paginatedDownloadListMock = () => {
   jest.spyOn(global, 'fetch').mockImplementation(url => {
     if (url.includes('2')) {
       return Promise.resolve({
+        ok: true,
         json: () => Promise.resolve(pageTwoDownloadList),
       });
     }
 
     return Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(pageOneDownloadList),
     });
   });
@@ -156,20 +163,37 @@ export const filteredDownloadListMock = () => {
   jest.spyOn(global, 'fetch').mockImplementation(url => {
     if (url.includes('Completed,Error') && url.includes('1')) {
       return Promise.resolve({
+        ok: true,
         json: () => Promise.resolve(pageOneCompletedDownloadList),
       });
     } else if (url.includes('Completed,Error') && url.includes('2')) {
       return Promise.resolve({
+        ok: true,
         json: () => Promise.resolve(pageTwoCompletedDownloadList),
       });
     } else if (url.includes('In Progress') && url.includes('2')) {
       return Promise.resolve({
+        ok: true,
         json: () => Promise.resolve(pageTwoInProgressDownloadList),
       });
     }
 
     return Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(pageOneInProgressDownloadList),
+    });
+  });
+};
+
+export const downloadListError = () => {
+  jest.spyOn(global, 'fetch').mockImplementation(() => {
+    return Promise.resolve({
+      ok: false,
+      json: () =>
+        Promise.resolve({
+          downloads: undefined,
+          totalPages: undefined,
+        }),
     });
   });
 };
@@ -183,6 +207,7 @@ export const defaultDownloadSettings = () => {
 
   jest.spyOn(global, 'fetch').mockImplementation(() => {
     return Promise.resolve({
+      ok: true,
       json: () => Promise.resolve(settingsMock),
     });
   });

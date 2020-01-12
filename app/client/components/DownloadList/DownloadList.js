@@ -15,7 +15,13 @@ export const DownloadListProvider = () => {
 
   const getDownloads = (pageNumber, status) => {
     fetch(getRoute('/api/downloads?page=' + pageNumber + '&status=' + status))
-      .then(response => response.json())
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        throw new Error('Received non-2xx status code');
+      })
       .then(responseJson => {
         setDownloads(responseJson.downloads);
         setTotalPages(responseJson.totalPages);
