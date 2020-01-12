@@ -8,6 +8,8 @@ import {
   downloadListMock,
   paginatedDownloadListMock,
   filteredDownloadListMock,
+  downloadListError,
+  sleep,
 } from 'Utils/mocks';
 
 test('should fetch and render download list', async () => {
@@ -109,4 +111,26 @@ test('should load specific status when status filter clicked on', async () => {
   expect(secondPageInProgressDownloadText).toBeInTheDocument();
   const secondPageInProgressDownloadNameText = await findByText('Download One');
   expect(secondPageInProgressDownloadNameText).toBeInTheDocument();
+});
+
+test('should maintain download list if non 2xx returned', async () => {
+  // GIVEN
+  downloadListMock();
+
+  // WHEN
+  const { findByText } = render(<DownloadList />);
+
+  // THEN
+  const firstDownloadText = await findByText('Download One');
+  expect(firstDownloadText).toBeInTheDocument();
+
+  // GIVEN
+  downloadListError();
+
+  // WHEN
+  await sleep(1000);
+
+  // THEN
+  const secondDownloadText = await findByText('Download Two');
+  expect(secondDownloadText).toBeInTheDocument();
 });
