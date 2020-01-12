@@ -90,7 +90,7 @@ class File(db.Model):
 
     def parse_stats(self, line):
         status_re = re.search(
-            r"(\d+\.\d+)%\s+of\s+(\d+\.\d+\w+)\s"
+            r"(\d+\.\d+)%\s+of\s+(~?\d+\.\d+\w+)\s"
             r"+at\s+(\d+\.\d+.+)\s+ETA\s+((\d+:)?\d+:\d+)",
             line,
         )
