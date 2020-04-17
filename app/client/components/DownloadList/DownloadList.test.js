@@ -134,3 +134,65 @@ test('should maintain download list if non 2xx returned', async () => {
   const secondDownloadText = await findByText('Download Two');
   expect(secondDownloadText).toBeInTheDocument();
 });
+
+test('should change to loader on status change', async () => {
+  // GIVEN
+  filteredDownloadListMock();
+
+  // WHEN
+  const { findByText } = render(<DownloadList />);
+
+  // THEN
+  const firstDownloadText = await findByText('Download One');
+  expect(firstDownloadText).toBeInTheDocument();
+
+  // GIVEN
+  downloadListError();
+
+  // WHEN
+  const completedButton = await findByText('Completed Error');
+  fireEvent.click(completedButton);
+
+  // THEN
+  const loaderText = await findByText('Loading');
+  expect(loaderText).toBeInTheDocument();
+
+  // GIVEN
+  filteredDownloadListMock();
+
+  // THEN
+  const firstPageCompletedDownloadText = await findByText('COMPLETED');
+  expect(firstPageCompletedDownloadText).toBeInTheDocument();
+  const firstPageCompletedDownloadNameText = await findByText('Download Three');
+  expect(firstPageCompletedDownloadNameText).toBeInTheDocument();
+});
+
+test('should change to loader on page change', async () => {
+  // GIVEN
+  paginatedDownloadListMock();
+
+  // WHEN
+  const { findByText } = render(<DownloadList />);
+
+  // THEN
+  const firstDownloadText = await findByText('Download One');
+  expect(firstDownloadText).toBeInTheDocument();
+
+  // GIVEN
+  downloadListError();
+
+  // WHEN
+  const pageTwoButton = await findByText('2');
+  fireEvent.click(pageTwoButton);
+
+  // THEN
+  const loaderText = await findByText('Loading');
+  expect(loaderText).toBeInTheDocument();
+
+  // GIVEN
+  paginatedDownloadListMock();
+
+  // THEN
+  const secondPageDownloadText = await findByText('Download Three');
+  expect(secondPageDownloadText).toBeInTheDocument();
+});

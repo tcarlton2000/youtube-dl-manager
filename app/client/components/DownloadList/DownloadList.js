@@ -40,10 +40,12 @@ export const DownloadListProvider = () => {
   }, [activePage, statusFilter]);
 
   const handlePageChange = (e, value) => {
+    setDownloads(null);
     setActivePage(value.activePage);
   };
 
   const handleStatusChange = (e, value) => {
+    setDownloads(null);
     setStatusFilter(value.name);
     setActivePage(1);
   };
