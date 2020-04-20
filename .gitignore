@@ -14,6 +14,7 @@ __pycache__
 
 # Intellij Files
 .idea
+youtube-dl-manager.iml
 
 # DB Files
 test.db
