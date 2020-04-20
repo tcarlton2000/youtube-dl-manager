@@ -1,9 +1,10 @@
 import json
 
-from flask import Response, request, render_template
+from flask import Response, request, render_template, jsonify
 from werkzeug.exceptions import NotFound
 
 from app import errors  # noqa: F401
+from app.directory import get_directories_in_path
 from app.download import Download
 from app.file import File
 from app.settings import Settings
@@ -67,6 +68,16 @@ def change_settings():
     body = request.json
     Settings.update_settings(body)
     return json_response({}, 201)
+
+
+@app.route("/api/directories", methods=["POST"])
+def get_directories():
+    body = request.json
+
+    if "path" not in body:
+        return jsonify({"error": "'path' not found in request"}), 400
+
+    return json_response(get_directories_in_path(body["path"]), 200)
 
 
 if __name__ == "__main__":

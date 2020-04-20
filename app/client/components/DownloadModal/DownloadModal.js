@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form } from 'semantic-ui-react';
+import DownloadDirectoryList from './DownloadDirectoryList';
 import getRoute from 'Utils/getRoute';
 import PropTypes from 'prop-types';
 
 export const DownloadModal = () => {
   const [url, setUrl] = useState('');
   const [directory, setDirectory] = useState('/downloads');
-
-  const urlFromModal = event => {
-    setUrl(event.target.value);
-  };
-
-  const directoryFromModal = event => {
-    setDirectory(event.target.value);
-  };
 
   const submit = () => {
     fetch(getRoute('/api/downloads'), {
@@ -31,27 +24,20 @@ export const DownloadModal = () => {
 
   return (
     <DownloadModalModel
-      setUrl={urlFromModal}
-      setDirectory={directoryFromModal}
+      setUrl={setUrl}
+      setDirectory={setDirectory}
       url={url}
-      directory={directory}
       submit={submit}
     />
   );
 };
 
-export const DownloadModalModel = ({
-  setUrl,
-  setDirectory,
-  url,
-  directory,
-  submit,
-}) => {
+export const DownloadModalModel = ({ setUrl, setDirectory, url, submit }) => {
   const [showModal, setShowModal] = useState(false);
 
   const downloadClicked = () => {
-    closeModal();
     submit();
+    closeModal();
   };
 
   const openModal = () => {
@@ -59,17 +45,13 @@ export const DownloadModalModel = ({
   };
 
   const closeModal = () => {
-    setUrl({
-      target: {
-        value: '',
-      },
-    });
-    setDirectory({
-      target: {
-        value: '/downloads',
-      },
-    });
+    setUrl('');
+    setDirectory('/downloads');
     setShowModal(false);
+  };
+
+  const urlFromModal = event => {
+    setUrl(event.target.value);
   };
 
   return (
@@ -83,11 +65,11 @@ export const DownloadModalModel = ({
         <Form>
           <Form.Field>
             <label>URL</label>
-            <input onChange={setUrl} value={url} />
+            <input onChange={urlFromModal} value={url} />
           </Form.Field>
           <Form.Field>
             <label>Directory</label>
-            <input onChange={setDirectory} value={directory} />
+            <DownloadDirectoryList setDirectory={setDirectory} />
           </Form.Field>
         </Form>
       </Modal.Content>
@@ -107,6 +89,5 @@ DownloadModalModel.propTypes = {
   setUrl: PropTypes.func,
   setDirectory: PropTypes.func,
   url: PropTypes.string,
-  directory: PropTypes.string,
   submit: PropTypes.func,
 };
