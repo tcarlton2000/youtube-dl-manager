@@ -161,17 +161,17 @@ export const paginatedDownloadListMock = () => {
 
 export const filteredDownloadListMock = () => {
   jest.spyOn(global, 'fetch').mockImplementation(url => {
-    if (url.includes('Completed,Error') && url.includes('1')) {
+    if (url.includes('Completed,Error') && url.includes('page=1')) {
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve(pageOneCompletedDownloadList),
       });
-    } else if (url.includes('Completed,Error') && url.includes('2')) {
+    } else if (url.includes('Completed,Error') && url.includes('page=2')) {
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve(pageTwoCompletedDownloadList),
       });
-    } else if (url.includes('In Progress') && url.includes('2')) {
+    } else if (url.includes('In Progress') && url.includes('page=2')) {
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve(pageTwoInProgressDownloadList),

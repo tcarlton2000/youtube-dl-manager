@@ -12,6 +12,24 @@ import {
   sleep,
 } from 'Utils/mocks';
 
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 test('should fetch and render download list', async () => {
   // GIVEN
   downloadListMock();
@@ -29,26 +47,15 @@ test('should fetch and render download list', async () => {
   const firstDownloadPercent = await findByText('50%');
   expect(firstDownloadPercent).toBeInTheDocument();
 
-  const secondDownloadPercent = await findByText('100%');
-  expect(secondDownloadPercent).toBeInTheDocument();
+  const firstDownloadStats = await findByText(
+    'Size: 30.6MiB, Speed: 100KiB/s, ETA: 00:38',
+  );
+  expect(firstDownloadStats).toBeInTheDocument();
 
-  const firstDownloadSize = await findByText('30.6MiB');
-  expect(firstDownloadSize).toBeInTheDocument();
-
-  const secondDownloadSize = await findByText('52.8MiB');
-  expect(secondDownloadSize).toBeInTheDocument();
-
-  const firstDownloadSpeed = await findByText('100KiB/s');
-  expect(firstDownloadSpeed).toBeInTheDocument();
-
-  const secondDownloadSpeed = await findByText('0KiB/s');
-  expect(secondDownloadSpeed).toBeInTheDocument();
-
-  const firstDownloadTimeRemaining = await findByText('00:38');
-  expect(firstDownloadTimeRemaining).toBeInTheDocument();
-
-  const secondDownloadTimeRemaining = await findByText('00:00');
-  expect(secondDownloadTimeRemaining).toBeInTheDocument();
+  const secondDownloadStats = await findByText(
+    'Size: 52.8MiB, Speed: 0KiB/s, ETA: 00:00',
+  );
+  expect(secondDownloadStats).toBeInTheDocument();
 });
 
 test('should load specific page when pagination link clicked on', async () => {
@@ -79,18 +86,14 @@ test('should load specific status when status filter clicked on', async () => {
   const { findByText } = render(<DownloadList />);
 
   // THEN
-  const firstPageInProgressDownloadText = await findByText('IN PROGRESS');
-  expect(firstPageInProgressDownloadText).toBeInTheDocument();
   const firstPageInProgressDownloadNameText = await findByText('Download One');
   expect(firstPageInProgressDownloadNameText).toBeInTheDocument();
 
   // WHEN
-  const completedButton = await findByText('Completed Error');
+  const completedButton = await findByText('Completed');
   fireEvent.click(completedButton);
 
   // THEN
-  const firstPageCompletedDownloadText = await findByText('COMPLETED');
-  expect(firstPageCompletedDownloadText).toBeInTheDocument();
   const firstPageCompletedDownloadNameText = await findByText('Download Three');
   expect(firstPageCompletedDownloadNameText).toBeInTheDocument();
 
@@ -107,8 +110,6 @@ test('should load specific status when status filter clicked on', async () => {
   fireEvent.click(inProgressButton);
 
   // THEN
-  const secondPageInProgressDownloadText = await findByText('IN PROGRESS');
-  expect(secondPageInProgressDownloadText).toBeInTheDocument();
   const secondPageInProgressDownloadNameText = await findByText('Download One');
   expect(secondPageInProgressDownloadNameText).toBeInTheDocument();
 });
@@ -140,7 +141,7 @@ test('should change to loader on status change', async () => {
   filteredDownloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText, findByTestId } = render(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');
@@ -150,19 +151,17 @@ test('should change to loader on status change', async () => {
   downloadListError();
 
   // WHEN
-  const completedButton = await findByText('Completed Error');
+  const completedButton = await findByText('Completed');
   fireEvent.click(completedButton);
 
   // THEN
-  const loaderText = await findByText('Loading');
-  expect(loaderText).toBeInTheDocument();
+  const spinner = await findByTestId('spinner');
+  expect(spinner).toBeInTheDocument();
 
   // GIVEN
   filteredDownloadListMock();
 
   // THEN
-  const firstPageCompletedDownloadText = await findByText('COMPLETED');
-  expect(firstPageCompletedDownloadText).toBeInTheDocument();
   const firstPageCompletedDownloadNameText = await findByText('Download Three');
   expect(firstPageCompletedDownloadNameText).toBeInTheDocument();
 });
@@ -172,7 +171,7 @@ test('should change to loader on page change', async () => {
   paginatedDownloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText, findByTestId } = render(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');
@@ -186,8 +185,8 @@ test('should change to loader on page change', async () => {
   fireEvent.click(pageTwoButton);
 
   // THEN
-  const loaderText = await findByText('Loading');
-  expect(loaderText).toBeInTheDocument();
+  const spinner = await findByTestId('spinner');
+  expect(spinner).toBeInTheDocument();
 
   // GIVEN
   paginatedDownloadListMock();

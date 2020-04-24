@@ -6,66 +6,93 @@ import Download from '../Download';
 
 test('should render download name, percent, and statistics for In Progress', () => {
   // WHEN
-  const { getByText } = render(
+  const { getByText, getByTestId } = render(
     <Download
-      name={'Download Name'}
-      status={'In Progress'}
-      percent={50.5}
-      size={'23MiB'}
-      speed={'1.23MiB/s'}
-      timeRemaining={'01:34'}
+      download={{
+        name: 'Download Name',
+        status: 'In Progress',
+        percent: 50.8,
+        size: '23MiB',
+        speed: '1.23MiB/s',
+        timeRemaining: '01:34',
+      }}
     />,
   );
 
   // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
-  expect(getByText('IN PROGRESS')).toBeInTheDocument();
   expect(getByText('50%')).toBeInTheDocument();
-  expect(getByText('23MiB')).toBeInTheDocument();
-  expect(getByText('1.23MiB/s')).toBeInTheDocument();
-  expect(getByText('01:34')).toBeInTheDocument();
+  expect(
+    getByText('Size: 23MiB, Speed: 1.23MiB/s, ETA: 01:34'),
+  ).toBeInTheDocument();
+  expect(getByTestId('no-error')).toBeInTheDocument();
 });
 
 test('should render download name only for Completed', () => {
   // WHEN
-  const { getByText, queryByText } = render(
+  const { getByText, queryByText, getByTestId } = render(
     <Download
-      name={'Download Name'}
-      status={'Completed'}
-      percent={50.5}
-      size={'23MiB'}
-      speed={'1.23MiB/s'}
-      timeRemaining={'01:34'}
+      download={{
+        name: 'Download Name',
+        status: 'Completed',
+        percent: 100.0,
+        size: '23MiB',
+        speed: '1.23MiB/s',
+        timeRemaining: '01:34',
+      }}
     />,
   );
 
   // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
-  expect(getByText('COMPLETED')).toBeInTheDocument();
-  expect(queryByText('50%')).not.toBeInTheDocument();
-  expect(queryByText('23MiB')).not.toBeInTheDocument();
-  expect(queryByText('1.23MiB/s')).not.toBeInTheDocument();
-  expect(queryByText('01:34')).not.toBeInTheDocument();
+  expect(queryByText('100%')).not.toBeInTheDocument();
+  expect(
+    queryByText('Size: 23MiB, Speed: 1.23MiB/s, ETA: 01:34'),
+  ).not.toBeInTheDocument();
+  expect(getByTestId('no-error')).toBeInTheDocument();
 });
 
 test('should render download name only for Error', () => {
   // WHEN
-  const { getByText, queryByText } = render(
+  const { getByText, queryByText, getByTestId } = render(
     <Download
-      name={'Download Name'}
-      status={'Error'}
-      percent={50.5}
-      size={'23MiB'}
-      speed={'1.23MiB/s'}
-      timeRemaining={'01:34'}
+      download={{
+        name: 'Download Name',
+        status: 'Error',
+        percent: 50.0,
+        size: '23MiB',
+        speed: '1.23MiB/s',
+        timeRemaining: '01:34',
+      }}
     />,
   );
 
   // THEN
   expect(getByText('Download Name')).toBeInTheDocument();
-  expect(getByText('ERROR')).toBeInTheDocument();
   expect(queryByText('50%')).not.toBeInTheDocument();
-  expect(queryByText('23MiB')).not.toBeInTheDocument();
-  expect(queryByText('1.23MiB/s')).not.toBeInTheDocument();
-  expect(queryByText('01:34')).not.toBeInTheDocument();
+  expect(
+    queryByText('Size: 23MiB, Speed: 1.23MiB/s, ETA: 01:34'),
+  ).not.toBeInTheDocument();
+  expect(getByTestId('error')).toBeInTheDocument();
+});
+
+test('should not show description if all fields not present', () => {
+  // WHEN
+  const { getByText, queryByText, getByTestId } = render(
+    <Download
+      download={{
+        name: 'Download Name',
+        status: 'In Progress',
+        percent: 0.0,
+        size: null,
+        speed: null,
+        timeRemaining: null,
+      }}
+    />,
+  );
+
+  // THEN
+  expect(getByText('Download Name')).toBeInTheDocument();
+  expect(queryByText('Size: , Speed: , ETA: ')).not.toBeInTheDocument();
+  expect(getByTestId('no-error')).toBeInTheDocument();
 });

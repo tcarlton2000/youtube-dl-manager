@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Modal, Form } from 'semantic-ui-react';
+import { Modal, Button } from 'antd';
 import DownloadDirectoryList from './DownloadDirectoryList';
 import getRoute from 'Utils/getRoute';
 import PropTypes from 'prop-types';
@@ -55,33 +55,24 @@ export const DownloadModalModel = ({ setUrl, setDirectory, url, submit }) => {
   };
 
   return (
-    <Modal
-      open={showModal}
-      onClose={closeModal}
-      trigger={<Button onClick={openModal}>New Download...</Button>}
-    >
-      <Modal.Header>New Download</Modal.Header>
-      <Modal.Content>
-        <Form>
-          <Form.Field>
-            <label>URL</label>
-            <input onChange={urlFromModal} value={url} />
-          </Form.Field>
-          <Form.Field>
-            <label>Directory</label>
-            <DownloadDirectoryList setDirectory={setDirectory} />
-          </Form.Field>
-        </Form>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button primary onClick={downloadClicked}>
-          Download
-        </Button>
-        <Button secondary onClick={closeModal}>
-          Cancel
-        </Button>
-      </Modal.Actions>
-    </Modal>
+    <div>
+      <Button type="primary" onClick={openModal}>
+        New Download...
+      </Button>
+      <Modal
+        title="New Download"
+        visible={showModal}
+        onOk={downloadClicked}
+        onCancel={closeModal}
+      >
+        <p>
+          <label>URL: </label>
+          <input onChange={urlFromModal} value={url} />
+        </p>
+        <label>Directory</label>
+        <DownloadDirectoryList setDirectory={setDirectory} />
+      </Modal>
+    </div>
   );
 };
 

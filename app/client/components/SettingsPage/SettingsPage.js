@@ -1,18 +1,19 @@
+// React Imports
 import React, { useState, useEffect } from 'react';
-import { Icon, Form, Button, Loader, Message } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
+// Antd Imports
+import { Alert, Form, Button, Spin } from 'antd';
+
+// Component Imports
 import Setting from 'Components/Setting';
+
+// Util Imports
 import getRoute from 'Utils/getRoute';
 
 export const SettingsPage = () => {
   return (
     <div>
-      <Link to="/">
-        <Icon name="angle left" />
-        Back to Main Page
-      </Link>
-      <h2>Settings</h2>
       <Settings />
     </div>
   );
@@ -35,15 +36,8 @@ export const Settings = () => {
       });
   }, []);
 
-  const changeSettings = e => {
-    const { name, value } = e.target;
-
-    setSettings(() => ({
-      [name]: value,
-    }));
-  };
-
-  const submit = () => {
+  const submit = values => {
+    setSettings(values);
     fetch(getRoute('/api/settings'), {
       method: 'POST',
       headers: {
@@ -51,7 +45,7 @@ export const Settings = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        settings: settings,
+        settings: values,
       }),
     })
       .then(response => {
@@ -69,7 +63,6 @@ export const Settings = () => {
   return (
     <SettingsModel
       settings={settings}
-      changeSettings={changeSettings}
       submit={submit}
       saved={saved}
       error={error}
@@ -77,35 +70,27 @@ export const Settings = () => {
   );
 };
 
-export const SettingsModel = ({
-  settings,
-  changeSettings,
-  submit,
-  saved,
-  error,
-}) => {
+export const SettingsModel = ({ settings, submit, saved, error }) => {
   if (settings !== null) {
     return (
-      <Form onSubmit={submit}>
-        <Setting
-          label="Download Directory"
-          name="downloadDirectory"
-          value={settings.downloadDirectory}
-          changeSetting={changeSettings}
-        />
-        <Button type="submit">Save Changes</Button>
-        {saved && <Message positive>Changes Saved</Message>}
-        {error && <Message negative>{error}</Message>}
+      <Form onFinish={submit} initialValues={settings}>
+        <Setting label="Download Directory" name="downloadDirectory" />
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Save Changes
+          </Button>
+        </Form.Item>
+        {saved && <Alert message="Changes Saved" />}
+        {error && <Alert message={error} type="error" />}
       </Form>
     );
   } else {
-    return <Loader />;
+    return <Spin className={'spinner'} size="large" data-testid="spinner" />;
   }
 };
 
 SettingsModel.propTypes = {
   settings: PropTypes.object,
-  changeSettings: PropTypes.func,
   submit: PropTypes.func,
   saved: PropTypes.bool,
   error: PropTypes.string,
