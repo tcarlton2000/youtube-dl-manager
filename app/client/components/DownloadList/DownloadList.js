@@ -1,20 +1,48 @@
+// React Imports
 import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
+
+// Antd Imports
+import { List, Menu, Pagination, Spin } from 'antd';
+
+// Component Imports
 import Download from 'Components/Download';
-import { Segment, Loader, Dimmer, Pagination, Menu } from 'semantic-ui-react';
+import DownloadModal from 'Components/DownloadModal';
+
+// Util Imports
 import getRoute from 'Utils/getRoute';
+
+// Status and Page Constants
+const IN_PROGRESS_KEY = 'inProgress';
+const COMPLETED_KEY = 'completed';
 
 const IN_PROGRESS_STATUS = 'In Progress';
 const COMPLETED_STATUS = 'Completed,Error';
+
+const PAGE_SIZE = 10;
+
+const statusMap = {
+  inProgress: IN_PROGRESS_STATUS,
+  completed: COMPLETED_STATUS,
+};
 
 export const DownloadListProvider = () => {
   const [downloads, setDownloads] = useState(null);
   const [activePage, setActivePage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState(IN_PROGRESS_STATUS);
+  const [statusFilter, setStatusFilter] = useState(IN_PROGRESS_KEY);
 
   const getDownloads = (pageNumber, status) => {
-    fetch(getRoute('/api/downloads?page=' + pageNumber + '&status=' + status))
+    fetch(
+      getRoute(
+        '/api/downloads?limit=' +
+          PAGE_SIZE +
+          '&page=' +
+          pageNumber +
+          '&status=' +
+          statusMap[status],
+      ),
+    )
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -39,84 +67,74 @@ export const DownloadListProvider = () => {
     return () => clearInterval(interval);
   }, [activePage, statusFilter]);
 
-  const handlePageChange = (e, value) => {
+  const handlePageChange = (page, pageSize) => {
     setDownloads(null);
-    setActivePage(value.activePage);
+    setActivePage(page);
   };
 
-  const handleStatusChange = (e, value) => {
+  const handleStatusChange = ({ key }) => {
     setDownloads(null);
-    setStatusFilter(value.name);
+    setStatusFilter(key);
     setActivePage(1);
   };
 
   return (
-    <DownloadListModel
-      downloads={downloads}
-      activePage={activePage}
-      totalPages={totalPages}
-      handlePageChange={handlePageChange}
-      statusFilter={statusFilter}
-      handleStatusChange={handleStatusChange}
-    />
+    <div>
+      <table style={{ width: '100%' }}>
+        <tbody>
+          <tr>
+            <td>
+              <Pagination
+                current={activePage}
+                total={PAGE_SIZE * totalPages}
+                pageSize={PAGE_SIZE}
+                onChange={handlePageChange}
+              />
+            </td>
+            <td style={{ textAlign: 'right' }}>
+              <DownloadModal />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <DownloadListModel
+        downloads={downloads}
+        activePage={activePage}
+        totalPages={totalPages}
+        handlePageChange={handlePageChange}
+        statusFilter={statusFilter}
+        handleStatusChange={handleStatusChange}
+      />
+    </div>
   );
 };
 
 export const DownloadListModel = ({
   downloads,
-  activePage,
-  totalPages,
-  handlePageChange,
   statusFilter,
   handleStatusChange,
 }) => {
   if (downloads !== null) {
     return (
       <div>
-        <Menu pointing secondary>
-          <Menu.Item
-            name={IN_PROGRESS_STATUS}
-            active={statusFilter === IN_PROGRESS_STATUS}
-            onClick={handleStatusChange}
-          />
-          <Menu.Item
-            name={COMPLETED_STATUS}
-            active={statusFilter === COMPLETED_STATUS}
-            onClick={handleStatusChange}
-          />
+        <Menu
+          onClick={handleStatusChange}
+          selectedKeys={[statusFilter]}
+          mode="horizontal"
+        >
+          <Menu.Item key={IN_PROGRESS_KEY}>In Progress</Menu.Item>
+          <Menu.Item key={COMPLETED_KEY}>Completed</Menu.Item>
         </Menu>
-        <Segment.Group raised>
-          {downloads.map(item => (
-            <Download
-              key={item.id}
-              name={item.name}
-              status={item.status}
-              percent={item.percent}
-              size={item.size}
-              speed={item.speed}
-              timeRemaining={item.timeRemaining}
-            />
-          ))}
-        </Segment.Group>
-        <div align="center">
-          <Pagination
-            firstItem={null}
-            lastItem={null}
-            activePage={activePage}
-            onPageChange={handlePageChange}
-            totalPages={totalPages}
-            siblingRange={1}
-            boundaryRange={0}
-          />
-        </div>
+        <List
+          className="downloadList"
+          itemLayout="horizontal"
+          dataSource={downloads}
+          renderItem={item => <Download download={item} />}
+        />
       </div>
     );
   } else {
-    return (
-      <Dimmer active inverted>
-        <Loader>Loading</Loader>
-      </Dimmer>
-    );
+    return <Spin className="spinner" size="large" data-testid="spinner" />;
   }
 };
 

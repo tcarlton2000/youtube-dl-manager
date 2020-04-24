@@ -10,6 +10,20 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 test('should load settings from API and display', async () => {
   // GIVEN
   defaultDownloadSettings();
@@ -30,8 +44,8 @@ test('should update and submit change', async () => {
   defaultDownloadSettings();
 
   // WHEN
-  const { findByLabelText, findByText } = render(<Settings />);
-  const input = await findByLabelText('downloadDirectory');
+  const { findByTestId, findByText, queryByText } = render(<Settings />);
+  const input = await findByTestId('downloadDirectory');
   fireEvent.change(input, {
     target: {
       value: '/changeme',
@@ -53,11 +67,13 @@ test('should update and submit change', async () => {
   });
 
   const save = await findByText('Save Changes');
-  fireEvent.click(save);
-  expect(global.fetch).toHaveBeenCalledTimes(2);
+  fireEvent.submit(save);
 
   const saved = await findByText('Changes Saved');
   expect(saved).toBeInTheDocument();
+
+  const error = await queryByText('Error saving settings');
+  expect(error).not.toBeInTheDocument();
 });
 
 test('should display error message on API failure', async () => {
@@ -75,8 +91,8 @@ test('should display error message on API failure', async () => {
   });
 
   const save = await findByText('Save Changes');
-  fireEvent.click(save);
-  expect(global.fetch).toHaveBeenCalledTimes(2);
+  expect(save).toBeInTheDocument();
+  fireEvent.submit(save);
 
   const saved = await queryByText('Changes Saved');
   expect(saved).not.toBeInTheDocument();

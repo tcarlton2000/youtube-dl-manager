@@ -1,20 +1,51 @@
+// React Imports
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import ReactDOM from 'react-dom';
-import 'semantic-ui-css/semantic.min.css';
-import './Compact.css';
-import MainPage from 'Components/MainPage';
+
+// Antd Imports
+import { Layout, Menu } from 'antd';
+
+// CSS Imports
+import 'antd/dist/antd.css';
+import './index.css';
+
+// Component Imports
+import DownloadList from 'Components/DownloadList';
 import SettingsPage from 'Components/SettingsPage';
-import { Container } from 'semantic-ui-react';
+
+const { Header, Content } = Layout;
+
+const MENU_LINK_MAP = {
+  '/': 'downloads',
+  '/settings': 'settings',
+};
 
 const App = () => {
   return (
     <Router>
-      <Container margin={20}>
-        <h1>Youtube Download Manager</h1>
-        <Route exact path="/" component={MainPage} />
-        <Route path="/settings" component={SettingsPage} />
-      </Container>
+      <Layout className="layout" style={{ height: '100vh' }}>
+        <Header>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={MENU_LINK_MAP[window.location.pathname]}
+          >
+            <Menu.Item key="downloads">
+              <Link to="/">Downloads</Link>
+            </Menu.Item>
+            <Menu.Item key="settings">
+              <Link to="/settings">Settings</Link>
+            </Menu.Item>
+          </Menu>
+        </Header>
+        <Content style={{ padding: '10px 25px' }}>
+          <div className="site-layout-content" style={{ height: '85vh' }}>
+            <Route exact path="/" component={DownloadList} />
+            <Route path="/settings" component={SettingsPage} />
+          </div>
+        </Content>
+      </Layout>
     </Router>
   );
 };

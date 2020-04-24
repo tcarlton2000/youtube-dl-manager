@@ -5,13 +5,17 @@ import { render, fireEvent } from '@testing-library/react';
 import 'isomorphic-fetch';
 import DownloadModal from '../DownloadModal';
 
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
 test('should open DownloadModal on button click', () => {
   // WHEN
   const { getByText } = render(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
 
   // THEN
-  expect(getByText('URL')).toBeInTheDocument();
+  expect(getByText('URL:')).toBeInTheDocument();
   expect(getByText('Directory')).toBeInTheDocument();
 });
 
@@ -22,26 +26,27 @@ test('should POST and close modal on Download click', () => {
   });
 
   // THEN
-  const { getByText, queryByText } = render(<DownloadModal />);
+  const { getByText } = render(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
-  fireEvent.click(getByText('Download'));
+  fireEvent.click(getByText('OK'));
 
   // THEN
-  expect(queryByText('URL')).not.toBeInTheDocument();
-  expect(queryByText('Directory')).not.toBeInTheDocument();
-
   expect(global.fetch).toHaveBeenCalledTimes(1);
 });
 
 test('should close on Cancel click', () => {
+  // GIVEN
+  jest.spyOn(global, 'fetch').mockImplementation(() => {
+    return Promise.resolve({});
+  });
+
   // WHEN
-  const { getByText, queryByText } = render(<DownloadModal />);
+  const { getByText } = render(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
   fireEvent.click(getByText('Cancel'));
 
   // THEN
-  expect(queryByText('URL')).not.toBeInTheDocument();
-  expect(queryByText('Directory')).not.toBeInTheDocument();
+  expect(global.fetch).toHaveBeenCalledTimes(0);
 });
 
 test('should fill in directory when clicked on tree', async () => {
@@ -72,6 +77,6 @@ test('should fill in directory when clicked on tree', async () => {
   });
 
   // WHEN
-  const downloadButton = await getByText('Download');
+  const downloadButton = await getByText('OK');
   fireEvent.click(downloadButton);
 });

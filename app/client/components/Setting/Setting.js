@@ -1,24 +1,19 @@
+// React Imports
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'semantic-ui-react';
 
-export const Setting = ({ label, name, value, changeSetting }) => {
+// Antd Imports
+import { Form, Input } from 'antd';
+
+export const Setting = ({ label, name }) => {
   return (
-    <Form.Field>
-      <label>{label}</label>
-      <input
-        aria-label={name}
-        onChange={changeSetting}
-        name={name}
-        value={value}
-      />
-    </Form.Field>
+    <Form.Item label={label} name={name}>
+      <Input data-testid={name} />
+    </Form.Item>
   );
 };
 
 Setting.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string,
-  value: PropTypes.string,
-  changeSetting: PropTypes.func,
 };
