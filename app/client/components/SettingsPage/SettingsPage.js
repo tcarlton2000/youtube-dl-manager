@@ -1,5 +1,5 @@
 // React Imports
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 // Antd Imports
@@ -10,6 +10,7 @@ import Setting from 'Components/Setting';
 
 // Util Imports
 import getRoute from 'Utils/getRoute';
+import { SettingsContext } from 'Utils/context';
 
 export const SettingsPage = () => {
   return (
@@ -20,24 +21,11 @@ export const SettingsPage = () => {
 };
 
 export const Settings = () => {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useContext(SettingsContext);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch(getRoute('/api/settings'))
-      .then(response => response.json())
-      .then(responseJson => {
-        setSettings(responseJson.settings);
-      })
-      .catch(error => {
-        setError('Error retrieving settings');
-        console.error(error);
-      });
-  }, []);
-
   const submit = values => {
-    setSettings(values);
     fetch(getRoute('/api/settings'), {
       method: 'POST',
       headers: {
@@ -52,6 +40,7 @@ export const Settings = () => {
         if (!response.ok) {
           throw Error(response.statusText);
         }
+        setSettings(values);
         setSaved(true);
       })
       .catch(error => {

@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import getRoute from 'Utils/getRoute';
+import { SettingsContext } from 'Utils/context';
 import { Tree } from 'antd';
 import PropTypes from 'prop-types';
 
 const { DirectoryTree } = Tree;
-const initTreeDate = [
-  {
-    title: 'downloads',
-    key: '/downloads',
-  },
-];
 
 /**
  * Update the tree data for new directory
@@ -50,6 +45,13 @@ const formatDirectoryList = (basePath, directories) => {
 };
 
 export const DownloadDirectoryList = ({ setDirectory }) => {
+  const settings = useContext(SettingsContext)[0];
+  const initTreeDate = [
+    {
+      title: 'downloads',
+      key: settings.downloadDirectory,
+    },
+  ];
   const [treeData, setTreeData] = useState(initTreeDate);
 
   /**
@@ -104,6 +106,7 @@ export const DownloadDirectoryList = ({ setDirectory }) => {
       loadData={onLoadData}
       onSelect={onSelect}
       treeData={treeData}
+      autoExpandParent={false}
     />
   );
 };

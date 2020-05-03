@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
+import { renderWithSettings } from 'Utils/mocks';
 import 'isomorphic-fetch';
 import DownloadList from '../DownloadList';
 import {
@@ -35,7 +36,7 @@ test('should fetch and render download list', async () => {
   downloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');
@@ -63,7 +64,7 @@ test('should load specific page when pagination link clicked on', async () => {
   paginatedDownloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstPageDownloadText = await findByText('Download One');
@@ -83,7 +84,7 @@ test('should load specific status when status filter clicked on', async () => {
   filteredDownloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstPageInProgressDownloadNameText = await findByText('Download One');
@@ -119,7 +120,7 @@ test('should maintain download list if non 2xx returned', async () => {
   downloadListMock();
 
   // WHEN
-  const { findByText } = render(<DownloadList />);
+  const { findByText } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');
@@ -141,7 +142,7 @@ test('should change to loader on status change', async () => {
   filteredDownloadListMock();
 
   // WHEN
-  const { findByText, findByTestId } = render(<DownloadList />);
+  const { findByText, findByTestId } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');
@@ -171,7 +172,7 @@ test('should change to loader on page change', async () => {
   paginatedDownloadListMock();
 
   // WHEN
-  const { findByText, findByTestId } = render(<DownloadList />);
+  const { findByText, findByTestId } = renderWithSettings(<DownloadList />);
 
   // THEN
   const firstDownloadText = await findByText('Download One');

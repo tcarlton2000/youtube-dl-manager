@@ -1,3 +1,8 @@
+import React from 'react';
+
+import { render } from '@testing-library/react';
+import { SettingsContext } from 'Utils/context';
+
 export const downloadList = {
   downloads: [
     {
@@ -211,4 +216,17 @@ export const defaultDownloadSettings = () => {
       json: () => Promise.resolve(settingsMock),
     });
   });
+};
+
+export const renderWithSettings = component => {
+  const settings = { downloadDirectory: '/downloads' };
+  const setSettings = values => {
+    expect(values).toStrictEqual({ downloadDirectory: '/changeme' });
+  };
+
+  return render(
+    <SettingsContext.Provider value={[settings, setSettings]}>
+      {component}
+    </SettingsContext.Provider>,
+  );
 };

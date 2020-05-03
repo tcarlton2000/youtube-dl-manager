@@ -1,5 +1,9 @@
 FROM mhart/alpine-node:10
 
+# Environment Variables
+ENV DOWNLOADS=/downloads
+ENV CONFIG=/config
+
 # System Basics
 RUN apk add --update python3
 RUN python3 -m pip install --upgrade pip

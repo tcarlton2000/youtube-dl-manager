@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
@@ -14,4 +15,5 @@ def create_app(database_uri, debug=False):
     return app, db
 
 
-app, db = create_app("sqlite:////config/youtube-dl.db", debug=True)
+config_dir = os.getenv("CONFIG", "/config")
+app, db = create_app(f"sqlite:///{config_dir}/youtube-dl.db", debug=True)

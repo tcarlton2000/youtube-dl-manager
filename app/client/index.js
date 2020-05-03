@@ -1,5 +1,5 @@
 // React Imports
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
@@ -14,6 +14,10 @@ import './index.css';
 import DownloadList from 'Components/DownloadList';
 import SettingsPage from 'Components/SettingsPage';
 
+// Util Imports
+import getRoute from 'Utils/getRoute';
+import { SettingsContext } from 'Utils/context';
+
 const { Header, Content } = Layout;
 
 const MENU_LINK_MAP = {
@@ -22,6 +26,16 @@ const MENU_LINK_MAP = {
 };
 
 const App = () => {
+  const [settings, setSettings] = useState({});
+  useEffect(() => {
+    fetch(getRoute('/api/settings'))
+      .then(response => response.json())
+      .then(responseJson => setSettings(responseJson.settings))
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
+
   return (
     <Router>
       <Layout className="layout" style={{ height: '100vh' }}>
@@ -41,8 +55,10 @@ const App = () => {
         </Header>
         <Content style={{ padding: '10px 25px' }}>
           <div className="site-layout-content" style={{ height: '85vh' }}>
-            <Route exact path="/" component={DownloadList} />
-            <Route path="/settings" component={SettingsPage} />
+            <SettingsContext.Provider value={[settings, setSettings]}>
+              <Route exact path="/" component={DownloadList} />
+              <Route path="/settings" component={SettingsPage} />
+            </SettingsContext.Provider>
           </div>
         </Content>
       </Layout>
