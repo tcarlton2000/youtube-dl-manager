@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
+import { renderWithSettings } from 'Utils/mocks';
 import 'isomorphic-fetch';
 import DownloadModal from '../DownloadModal';
 
@@ -11,7 +12,7 @@ afterEach(() => {
 
 test('should open DownloadModal on button click', () => {
   // WHEN
-  const { getByText } = render(<DownloadModal />);
+  const { getByText } = renderWithSettings(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
 
   // THEN
@@ -26,7 +27,7 @@ test('should POST and close modal on Download click', () => {
   });
 
   // THEN
-  const { getByText } = render(<DownloadModal />);
+  const { getByText } = renderWithSettings(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
   fireEvent.click(getByText('OK'));
 
@@ -41,7 +42,7 @@ test('should close on Cancel click', () => {
   });
 
   // WHEN
-  const { getByText } = render(<DownloadModal />);
+  const { getByText } = renderWithSettings(<DownloadModal />);
   fireEvent.click(getByText('New Download...'));
   fireEvent.click(getByText('Cancel'));
 
@@ -62,7 +63,9 @@ test('should fill in directory when clicked on tree', async () => {
   });
 
   // WHEN
-  const { getByText, getByTitle, findByTitle } = render(<DownloadModal />);
+  const { getByText, getByTitle, findByTitle } = renderWithSettings(
+    <DownloadModal />,
+  );
   fireEvent.click(getByText('New Download...'));
   fireEvent.click(getByTitle('downloads'));
 

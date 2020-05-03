@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Modal, Button } from 'antd';
 import DownloadDirectoryList from './DownloadDirectoryList';
 import getRoute from 'Utils/getRoute';
+import { SettingsContext } from 'Utils/context';
 import PropTypes from 'prop-types';
 
 export const DownloadModal = () => {
+  const settings = useContext(SettingsContext)[0];
   const [url, setUrl] = useState('');
-  const [directory, setDirectory] = useState('/downloads');
+  const [directory, setDirectory] = useState({});
+
+  useEffect(() => {
+    setDirectory(settings.downloadDirectory);
+  }, [settings]);
 
   const submit = () => {
     fetch(getRoute('/api/downloads'), {
@@ -46,7 +52,6 @@ export const DownloadModalModel = ({ setUrl, setDirectory, url, submit }) => {
 
   const closeModal = () => {
     setUrl('');
-    setDirectory('/downloads');
     setShowModal(false);
   };
 

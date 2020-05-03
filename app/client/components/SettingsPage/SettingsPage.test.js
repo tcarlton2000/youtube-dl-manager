@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom/extend-expect';
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import 'isomorphic-fetch';
+import { renderWithSettings } from 'Utils/mocks';
 import { Settings } from './SettingsPage';
 import { defaultDownloadSettings } from 'Utils/mocks';
 
@@ -29,7 +30,7 @@ test('should load settings from API and display', async () => {
   defaultDownloadSettings();
 
   // WHEN
-  const { findByDisplayValue, queryByText } = render(<Settings />);
+  const { findByDisplayValue, queryByText } = renderWithSettings(<Settings />);
 
   // THEN
   const field = await findByDisplayValue('/downloads');
@@ -44,7 +45,9 @@ test('should update and submit change', async () => {
   defaultDownloadSettings();
 
   // WHEN
-  const { findByTestId, findByText, queryByText } = render(<Settings />);
+  const { findByTestId, findByText, queryByText } = renderWithSettings(
+    <Settings />,
+  );
   const input = await findByTestId('downloadDirectory');
   fireEvent.change(input, {
     target: {
@@ -81,7 +84,7 @@ test('should display error message on API failure', async () => {
   defaultDownloadSettings();
 
   // WHEN
-  const { queryByText, findByText } = render(<Settings />);
+  const { queryByText, findByText } = renderWithSettings(<Settings />);
 
   // THEN
   jest.spyOn(global, 'fetch').mockImplementation(() => {
