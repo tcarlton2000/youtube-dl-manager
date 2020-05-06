@@ -38,7 +38,7 @@ const App = () => {
 
   return (
     <Router>
-      <Layout className="layout" style={{ height: '100vh' }}>
+      <Layout className="layout" style={{ minHeight: '100vh' }}>
         <Header>
           <Menu
             theme="dark"
@@ -54,7 +54,7 @@ const App = () => {
           </Menu>
         </Header>
         <Content style={{ padding: '10px 25px' }}>
-          <div className="site-layout-content" style={{ height: '85vh' }}>
+          <div className="site-layout-content">
             <SettingsContext.Provider value={[settings, setSettings]}>
               <Route exact path="/" component={DownloadList} />
               <Route path="/settings" component={SettingsPage} />
