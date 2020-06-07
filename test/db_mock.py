@@ -27,16 +27,10 @@ def create_new_file(
     directory="/downloads",
     url="http://url.com",
     status_id=1,
-    log="",
     percent=50.0,
 ):
     file = File(
-        name=name,
-        directory=directory,
-        url=url,
-        status_id=status_id,
-        log=log,
-        percent=percent,
+        name=name, directory=directory, url=url, status_id=status_id, percent=percent
     )
     db.session.add(file)
     return file

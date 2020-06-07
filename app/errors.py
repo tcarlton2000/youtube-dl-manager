@@ -1,9 +1,12 @@
+import logging
 import traceback
 
 from flask import jsonify
 from werkzeug.exceptions import NotFound
 
 from app.main import app
+
+logger = logging.getLogger("ErrorHandler")
 
 
 @app.errorhandler(NotFound)
@@ -13,6 +16,7 @@ def not_found(error):
 
 @app.errorhandler(Exception)
 def exception_handler(error):
+    logger.exception(error)
     return (
         jsonify(
             error="500 Internal Server Error",

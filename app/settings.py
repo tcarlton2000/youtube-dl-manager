@@ -1,9 +1,13 @@
+import logging
+
 from app.main import db
 
 DEFAULTS = {"downloadDirectory": "/downloads"}
 
 
 class Settings(db.Model):
+    logger = logging.getLogger("Settings")
+
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String, index=True, unique=True)
     value = db.Column(db.String)
@@ -30,6 +34,9 @@ class Settings(db.Model):
             else:
                 existing_setting.value = value
 
+        cls.logger.info(
+            "Settings updated: {}".format(",".join(new_settings["settings"]))
+        )
         db.session.commit()
 
     @classmethod
