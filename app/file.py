@@ -1,13 +1,16 @@
+import logging
 import math
 import re
 
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 from app.main import db
 from app.status import Status
 
 INITIAL_PAGE = 1
 DEFAULT_LIMIT = 10
+
+logger = logging.getLogger("File")
 
 
 def retry(func):
@@ -17,7 +20,8 @@ def retry(func):
             try:
                 output = func(*args)
                 retry = False
-            except OperationalError:
+            except (OperationalError, IntegrityError) as e:
+                logger.exception(e)
                 db.session.rollback()
         return output
 
@@ -32,7 +36,6 @@ class File(db.Model):
     status_id = db.Column(
         db.Integer, db.ForeignKey("status.id"), nullable=False, index=True
     )
-    log = db.Column(db.String, nullable=False)
     size = db.Column(db.String)
     speed = db.Column(db.String)
     percent = db.Column(db.Float, nullable=False)
@@ -63,16 +66,15 @@ class File(db.Model):
             url=url,
             directory=directory,
             status_id=Status.STATUS_IN_PROGRESS_ID,
-            log="",
             percent=0.0,
         )
         db.session.add(new_file)
         db.session.commit()
+        logger.info(f"New download ID: {new_file.id}")
         return new_file
 
     @retry
     def add_to_log(self, line):
-        self.log += line
         self.parse_name(line)
         self.parse_stats(line)
         db.session.commit()
@@ -85,6 +87,7 @@ class File(db.Model):
             )
             if starting_name_re:
                 self.name = starting_name_re.group(1)
+                logger.info(f"Found name for ID({self.id}): {self.name}")
             elif completed_name_re:
                 self.name = completed_name_re.group(1)
 
@@ -103,11 +106,13 @@ class File(db.Model):
     @retry
     def complete(self):
         self.status_id = Status.STATUS_COMPLETED_ID
+        logger.info(f"{self.name} completed")
         db.session.commit()
 
     @retry
     def error(self):
         self.status_id = Status.STATUS_ERROR_ID
+        logger.error(f"{self.name} errored")
         db.session.commit()
 
     def list_marshal(self):
@@ -151,5 +156,4 @@ class File(db.Model):
             "size": self.size,
             "speed": self.speed,
             "timeRemaining": self.time_remaining,
-            "log": self.log,
         }

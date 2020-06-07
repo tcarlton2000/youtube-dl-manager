@@ -1,4 +1,6 @@
 import json
+import logging
+import os
 
 from flask import Response, request, render_template, jsonify
 from werkzeug.exceptions import NotFound
@@ -9,6 +11,9 @@ from app.download import Download
 from app.file import File
 from app.settings import Settings
 from app.main import app, db
+
+logFormatter = "%(asctime)s - %(levelname)s - %(message)s"
+logging.basicConfig(format=logFormatter, level=os.environ.get("LOGLEVEL", "INFO"))
 
 
 def json_response(payload, status):

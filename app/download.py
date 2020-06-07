@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import threading
 
@@ -8,14 +9,17 @@ from app.settings import Settings
 
 
 class Download(threading.Thread):
+    logger = logging.getLogger("Download")
+
     def __init__(self, url, directory=None):
         self.url = url
         self.directory = directory
         self.id = None
+        self.logger.info(f"New Download: {url}")
         threading.Thread.__init__(self)
 
     def run(self):
-        cmd = "youtube-dl --no-mtime {}".format(self.url)
+        cmd = f"youtube-dl --no-mtime {self.url}"
         cwd = self.directory or Settings.get_setting("downloadDirectory")
         p = subprocess.Popen(
             cmd.split(),
