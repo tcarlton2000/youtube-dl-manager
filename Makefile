@@ -22,6 +22,3 @@ unittest:
 
 clean:
 	rm -rf app/test.db
-	rm -rf "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.mkv"
-	rm -rf "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.mp4"
-	rm -rf "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.webm"
