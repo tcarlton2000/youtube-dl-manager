@@ -17,6 +17,7 @@ logFormatter = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=logFormatter, level=os.environ.get("LOGLEVEL", "INFO"))
 
 download_types = {"youtube": YoutubeDownload, "gallery": GalleryDownload}
+port = {"youtube": 5000, "gallery": 5050}
 download_type = os.getenv("DOWNLOAD_TYPE", None)
 if download_type not in download_types:
     raise ValueError(f"DOWNLOAD_TYPE {download_type} not recognized")
@@ -94,4 +95,4 @@ def get_directories():
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port[download_type])
