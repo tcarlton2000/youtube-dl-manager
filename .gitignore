@@ -22,6 +22,7 @@ youtube-dl-manager.iml
 # DB Files
 test.db
 youtube-dl.db
+download-manager.db
 
 # NodeJS Files
 node_modules

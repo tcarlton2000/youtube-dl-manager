@@ -1,6 +1,5 @@
 import logging
 import math
-import re
 
 from sqlalchemy.exc import OperationalError, IntegrityError
 
@@ -14,12 +13,12 @@ logger = logging.getLogger("File")
 
 
 def retry(func):
-    def do_retry(*args):
-        retry = True
-        while retry:
+    def do_retry(*args, **kwargs):
+        try_retry = True
+        while try_retry:
             try:
-                output = func(*args)
-                retry = False
+                output = func(*args, **kwargs)
+                try_retry = False
             except (OperationalError, IntegrityError) as e:
                 logger.exception(e)
                 db.session.rollback()
@@ -61,9 +60,10 @@ class File(db.Model):
 
     @classmethod
     @retry
-    def new_file(cls, url, directory):
+    def new_file(cls, url, directory, name=None):
         new_file = File(
             url=url,
+            name=name,
             directory=directory,
             status_id=Status.STATUS_IN_PROGRESS_ID,
             percent=0.0,
@@ -74,37 +74,27 @@ class File(db.Model):
         return new_file
 
     @retry
-    def add_to_log(self, line):
-        self.parse_name(line)
-        self.parse_stats(line)
+    def update_db(self, stats):
+        if "name" in stats:
+            self.name = stats["name"]
+
+        if "percent" in stats:
+            self.percent = stats["percent"]
+
+        if "size" in stats:
+            self.size = stats["size"]
+
+        if "speed" in stats:
+            self.speed = stats["speed"]
+
+        if "time_remaining" in stats:
+            self.time_remaining = stats["time_remaining"]
+
         db.session.commit()
-
-    def parse_name(self, line):
-        if self.name is None:
-            starting_name_re = re.search(r"Destination: (.*)", line)
-            completed_name_re = re.search(
-                r"\[download\] (.*) has already been downloaded and merged", line
-            )
-            if starting_name_re:
-                self.name = starting_name_re.group(1)
-                logger.info(f"Found name for ID({self.id}): {self.name}")
-            elif completed_name_re:
-                self.name = completed_name_re.group(1)
-
-    def parse_stats(self, line):
-        status_re = re.search(
-            r"(\d+\.\d+)%\s+of\s+(~?\d+\.\d+\w+)\s"
-            r"+at\s+(\d+\.\d+.+)\s+ETA\s+((\d+:)?\d+:\d+)",
-            line,
-        )
-        if status_re:
-            self.percent = float(status_re.group(1))
-            self.size = status_re.group(2)
-            self.speed = status_re.group(3)
-            self.time_remaining = status_re.group(4)
 
     @retry
     def complete(self):
+        self.percent = 100
         self.status_id = Status.STATUS_COMPLETED_ID
         logger.info(f"{self.name} completed")
         db.session.commit()
