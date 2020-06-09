@@ -2,14 +2,12 @@ import logging
 import subprocess
 import threading
 
-from time import sleep
-
 from app.file import File
 from app.settings import Settings
 
 
-class Download(threading.Thread):
-    logger = logging.getLogger("Download")
+class GalleryDownload(threading.Thread):
+    logger = logging.getLogger("GalleryDownload")
 
     def __init__(self, url, directory=None):
         self.url = url
@@ -19,7 +17,7 @@ class Download(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        cmd = f"youtube-dl --no-mtime {self.url}"
+        cmd = f"gallery-dl {self.url} -d ."
         cwd = self.directory or Settings.get_setting("downloadDirectory")
         p = subprocess.Popen(
             cmd.split(),
@@ -29,7 +27,7 @@ class Download(threading.Thread):
             stderr=subprocess.PIPE,
         )
 
-        new_file = File.new_file(self.url, cwd)
+        new_file = File.new_file(self.url, cwd, name=self.url)
         self.id = new_file.id
 
         while True:
@@ -40,6 +38,3 @@ class Download(threading.Thread):
                 else:
                     new_file.error()
                 break
-            if output:
-                new_file.add_to_log(output)
-            sleep(0.1)  # Sleep between log entries to prevent DB locks

@@ -11,10 +11,15 @@ from test.db_mock import create_new_file
 def test_retry(db_commit_mock):
     # GIVEN
     file = create_new_file(db)
-    log = "34.7% of 102.16MiB at 144.30KiB/s ETA 07:53"
+    stats = {
+        "percent": 34.7,
+        "size": "102.16MiB",
+        "speed": "144.30KiB/s",
+        "time_remaining": "07:53",
+    }
 
     # WHEN
-    file.add_to_log(log)
+    file.update_db(stats)
 
     # THEN
     assert 2 == db_commit_mock.call_count

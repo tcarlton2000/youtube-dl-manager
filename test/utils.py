@@ -1,8 +1,11 @@
-from app import youtube
+import os
+
+os.environ["DOWNLOAD_TYPE"] = "youtube"
+from app import api  # noqa: F402
 
 
-youtube.app.config["TESTING"] = True
-youtube.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
-youtube.db.create_all()
-client = youtube.app.test_client()
-db = youtube.db
+api.app.config["TESTING"] = True
+api.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+api.db.create_all()
+client = api.app.test_client()
+db = api.db

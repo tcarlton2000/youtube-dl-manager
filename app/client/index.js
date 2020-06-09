@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import { Layout, Menu } from 'antd';
 
 // CSS Imports
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.less';
 import './index.css';
 
 // Component Imports

@@ -7,13 +7,20 @@ from werkzeug.exceptions import NotFound
 
 from app import errors  # noqa: F401
 from app.directory import get_directories_in_path
-from app.download import Download
+from app.gallery_download import GalleryDownload
+from app.youtube_download import YoutubeDownload
 from app.file import File
 from app.settings import Settings
 from app.main import app, db
 
 logFormatter = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=logFormatter, level=os.environ.get("LOGLEVEL", "INFO"))
+
+download_types = {"youtube": YoutubeDownload, "gallery": GalleryDownload}
+download_type = os.getenv("DOWNLOAD_TYPE", None)
+if download_type not in download_types:
+    raise ValueError(f"DOWNLOAD_TYPE {download_type} not recognized")
+downloader = download_types[download_type]
 
 
 def json_response(payload, status):
@@ -23,7 +30,7 @@ def json_response(payload, status):
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def index(path):
-    return render_template("index.html")
+    return render_template("index.html", download_type=download_type.title())
 
 
 @app.route("/api/downloads", methods=["GET"])
@@ -56,7 +63,7 @@ def download(file_id):
 
 
 def start_download(url, directory):
-    download = Download(url, directory=directory)
+    download = downloader(url, directory=directory)
     download.start()
     while download.id is None:
         pass

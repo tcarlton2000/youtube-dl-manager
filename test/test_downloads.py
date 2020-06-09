@@ -3,12 +3,6 @@ import pytest
 from test.utils import client, db
 from test.db_mock import create_file_list
 
-possible_download_names = [
-    "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.webm",
-    "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.f135.mp4",
-    "The Meta-Crisis Tenth Doctor _ Journey's End _ Doctor Who-nTfCxORgKEk.mp4",
-]
-
 
 @pytest.mark.parametrize(
     "page,limit,expected_limit,total_pages,status",

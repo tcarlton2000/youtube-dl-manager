@@ -16,4 +16,4 @@ def create_app(database_uri, debug=False):
 
 
 config_dir = os.getenv("CONFIG", "/config")
-app, db = create_app(f"sqlite:///{config_dir}/youtube-dl.db", debug=True)
+app, db = create_app(f"sqlite:///{config_dir}/download-manager.db", debug=True)
