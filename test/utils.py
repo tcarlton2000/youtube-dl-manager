@@ -1,7 +1,7 @@
 import os
 
 os.environ["DOWNLOAD_TYPE"] = "youtube"
-from app import api  # noqa: F402
+from app import api  # noqa: E402
 
 
 api.app.config["TESTING"] = True
