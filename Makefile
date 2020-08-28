@@ -1,3 +1,8 @@
+setup-dev:
+	sudo apt-get install python3.6
+	sudo apt install python3-pip
+	sudo -H pip3 install pipenv
+
 install:
 	pip3 install pipenv
 	pipenv install --dev
@@ -19,6 +24,12 @@ unittest:
 	PYTHONPATH=${PWD} pipenv run py.test -vv test/ --cov=app/ --cov-report term-missing --cov-fail-under 85
 	make clean
 	npm test
+
+run-youtube-local-python:
+	CONFIG=${PWD} DOWNLOAD_TYPE=youtube pipenv run python app/api.py
+
+run-gallery-local-python:
+	CONFIG=${PWD} DOWNLOAD_TYPE=gallery pipenv run python app/api.py
 
 clean:
 	rm -rf app/test.db
