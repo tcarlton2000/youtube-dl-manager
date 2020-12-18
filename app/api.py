@@ -7,8 +7,9 @@ from werkzeug.exceptions import NotFound
 
 from app import errors  # noqa: F401
 from app.directory import get_directories_in_path
-from app.gallery_download import GalleryDownload
-from app.youtube_download import YoutubeDownload
+from app.downloaders.gallery_download import GalleryDownload
+from app.downloaders.sw_download import SWDownload
+from app.downloaders.youtube_download import YoutubeDownload
 from app.file import File
 from app.settings import Settings
 from app.main import app, db
@@ -16,8 +17,12 @@ from app.main import app, db
 logFormatter = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=logFormatter, level=os.environ.get("LOGLEVEL", "INFO"))
 
-download_types = {"youtube": YoutubeDownload, "gallery": GalleryDownload}
-port = {"youtube": 5000, "gallery": 5050}
+download_types = {
+    "youtube": YoutubeDownload,
+    "gallery": GalleryDownload,
+    "sw": SWDownload,
+}
+port = {"youtube": 5000, "gallery": 5050, "sw": 5075}
 download_type = os.getenv("DOWNLOAD_TYPE", None)
 if download_type not in download_types:
     raise ValueError(f"DOWNLOAD_TYPE {download_type} not recognized")
