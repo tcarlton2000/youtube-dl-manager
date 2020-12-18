@@ -17,6 +17,7 @@ youtube_dl = "*"
 Flask-SQLAlchemy = "*"
 flask-compress = "*"
 gallery-dl = "*"
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "3.6"

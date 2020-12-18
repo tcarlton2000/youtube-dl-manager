@@ -1,6 +1,6 @@
 import pytest
 
-from app.youtube_download import YoutubeDownload
+from app.downloaders.youtube_download import YoutubeDownload
 
 
 @pytest.mark.parametrize(

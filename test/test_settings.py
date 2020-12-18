@@ -2,7 +2,7 @@ import json
 
 from unittest.mock import patch, MagicMock
 
-from app.youtube_download import subprocess
+from app.downloaders.youtube_download import subprocess
 from app.settings import Settings
 
 from test.db_mock import reset_db, create_new_setting

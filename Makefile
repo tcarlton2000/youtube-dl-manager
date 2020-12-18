@@ -31,5 +31,8 @@ run-youtube-local-python:
 run-gallery-local-python:
 	CONFIG=${PWD} DOWNLOAD_TYPE=gallery pipenv run python app/api.py
 
+run-sw-local-python:
+	CONFIG=${PWD} DOWNLOAD_TYPE=sw pipenv run python app/api.py
+
 clean:
 	rm -rf app/test.db

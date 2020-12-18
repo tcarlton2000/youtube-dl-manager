@@ -1,24 +1,19 @@
 import logging
 import subprocess
-import threading
 
+from app.downloaders.base_downloader import BaseDownloader
 from app.file import File
-from app.settings import Settings
 
 
-class GalleryDownload(threading.Thread):
+class GalleryDownload(BaseDownloader):
     logger = logging.getLogger("GalleryDownload")
 
     def __init__(self, url, directory=None):
-        self.url = url
-        self.directory = directory
-        self.id = None
-        self.logger.info(f"New Download: {url}")
-        threading.Thread.__init__(self)
+        super().__init__(url, directory=directory)
 
     def run(self):
         cmd = f"gallery-dl {self.url} -d ."
-        cwd = self.directory or Settings.get_setting("downloadDirectory")
+        cwd = self._get_download_directory()
         p = subprocess.Popen(
             cmd.split(),
             cwd=cwd,
@@ -27,14 +22,14 @@ class GalleryDownload(threading.Thread):
             stderr=subprocess.PIPE,
         )
 
-        new_file = File.new_file(self.url, cwd, name=self.url)
-        self.id = new_file.id
+        self.file = File.new_file(self.url, cwd, name=self.url)
+        self.id = self.file.id
 
         while True:
             output = p.stdout.readline()
             if output == "" and p.poll() is not None:
                 if p.poll() == 0:
-                    new_file.complete()
+                    self.file.complete()
                 else:
-                    new_file.error()
+                    self.file.error()
                 break
