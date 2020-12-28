@@ -3,11 +3,11 @@ FROM mhart/alpine-node:10
 # Environment Variables
 ENV DOWNLOADS=/downloads
 ENV CONFIG=/config
-ENV DOWNLOAD_TYPE=sw
 
 # System Basics
 RUN apk add --no-cache make gcc g++ python3 python3-dev
 RUN python3 -m pip install --upgrade pip
+RUN apk add ffmpeg && rm -rf /var/cache/apk/*
 RUN pip install pipenv
 
 # Python dependencies
@@ -26,7 +26,7 @@ RUN npm install
 WORKDIR .
 COPY ./app /app/app
 WORKDIR /app
-RUN npm run build:sw
+RUN npm run build
 
 ENV PYTHONPATH /app
 CMD ["pipenv", "run", "python", "app/api.py"]
