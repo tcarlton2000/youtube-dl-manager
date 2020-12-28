@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from unittest.mock import call, MagicMock, patch
 from app.downloaders.sw_download import SWDownload
@@ -43,3 +44,22 @@ def test_sw_download(mocked_open, mocked_mkdir, mocked_chdir, mocked_requests_ge
             call().write("content"),
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "url,expected_is_valid",
+    [
+        ("https://www.swdownload.com/video/1234", True),
+        ("https://www.youtube.com/video/343", False),
+    ],
+)
+def test_is_valid(url, expected_is_valid):
+    # GIVEN
+    os.environ["SW_DOWNLOAD_HOST"] = "www.swdownload.com"
+
+    # WHEN
+    download = SWDownload(url)
+    is_valid = download.is_valid()
+
+    # THEN
+    assert is_valid == expected_is_valid

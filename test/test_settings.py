@@ -1,8 +1,5 @@
 import json
 
-from unittest.mock import patch, MagicMock
-
-from app.downloaders.youtube_download import subprocess
 from app.settings import Settings
 
 from test.db_mock import reset_db, create_new_setting
@@ -81,33 +78,3 @@ def test_updating_existing_setting():
     )
     assert setting is not None
     assert setting.value == "/changed"
-
-
-@patch.object(
-    subprocess,
-    "Popen",
-    return_value=MagicMock(
-        stdout=MagicMock(readline=MagicMock(return_value="")),
-        poll=MagicMock(return_value=0),
-    ),
-)
-def test_download_setting_in_database(popen_mock):
-    # GIVEN
-    reset_db(db)
-    create_new_setting(db, key="downloadDirectory", value="/database")
-
-    # WHEN
-    client.post(
-        "/api/downloads",
-        data=json.dumps({"url": "https://www.youtube.com/watch?v=nTfCxORgKEk"}),
-        content_type="application/json",
-    )
-
-    # THEN
-    popen_mock.assert_called_with(
-        ["youtube-dl", "--no-mtime", "https://www.youtube.com/watch?v=nTfCxORgKEk"],
-        cwd="/database",
-        universal_newlines=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )

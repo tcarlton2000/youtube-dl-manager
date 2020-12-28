@@ -5,6 +5,7 @@ from sqlalchemy.exc import OperationalError, IntegrityError
 
 from app.main import db
 from app.status import Status
+from app.type import Type
 
 INITIAL_PAGE = 1
 DEFAULT_LIMIT = 10
@@ -35,6 +36,9 @@ class File(db.Model):
     status_id = db.Column(
         db.Integer, db.ForeignKey("status.id"), nullable=False, index=True
     )
+    type_id = db.Column(
+        db.Integer, db.ForeignKey("type.id"), nullable=False, index=True
+    )
     size = db.Column(db.String)
     speed = db.Column(db.String)
     percent = db.Column(db.Float, nullable=False)
@@ -49,7 +53,7 @@ class File(db.Model):
         query = query.order_by(File.id.desc()).paginate(page, limit, False).items
 
         return {
-            "downloads": [item.list_marshal() for item in query],
+            "downloads": [item.marshal() for item in query],
             "totalPages": File.total_pages(status, limit),
         }
 
@@ -60,11 +64,12 @@ class File(db.Model):
 
     @classmethod
     @retry
-    def new_file(cls, url, directory, name=None):
+    def new_file(cls, url, type_id, directory, name=None):
         new_file = File(
             url=url,
             name=name,
             directory=directory,
+            type_id=type_id,
             status_id=Status.STATUS_IN_PROGRESS_ID,
             percent=0.0,
         )
@@ -105,19 +110,6 @@ class File(db.Model):
         logger.error(f"{self.name} errored")
         db.session.commit()
 
-    def list_marshal(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "url": self.url,
-            "directory": self.directory,
-            "status": Status.id_to_name(self.status_id),
-            "percent": self.percent,
-            "size": self.size,
-            "speed": self.speed,
-            "timeRemaining": self.time_remaining,
-        }
-
     @staticmethod
     def filter_status(query, status):
         if status is None:
@@ -142,6 +134,7 @@ class File(db.Model):
             "url": self.url,
             "directory": self.directory,
             "status": Status.id_to_name(self.status_id),
+            "type": Type.id_to_name(self.type_id),
             "percent": self.percent,
             "size": self.size,
             "speed": self.speed,

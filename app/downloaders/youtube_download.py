@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import subprocess
 
@@ -6,6 +7,7 @@ from time import sleep
 
 from app.downloaders.base_downloader import BaseDownloader
 from app.file import File
+from app.type import Type
 
 
 class YoutubeDownload(BaseDownloader):
@@ -13,6 +15,10 @@ class YoutubeDownload(BaseDownloader):
 
     def __init__(self, url, directory=None):
         super().__init__(url, directory=directory)
+
+    def is_valid(self):
+        ret_val = os.system(f"youtube-dl --skip-download {self.url}")
+        return ret_val == 0
 
     def run(self):
         cmd = f"youtube-dl --no-mtime {self.url}"
@@ -25,7 +31,7 @@ class YoutubeDownload(BaseDownloader):
             stderr=subprocess.PIPE,
         )
 
-        self.file = File.new_file(self.url, cwd)
+        self.file = File.new_file(self.url, Type.TYPE_YOUTUBE_ID, cwd)
         self.id = self.file.id
 
         while True:

@@ -1,10 +1,13 @@
 import logging
 import requests
 import os
+
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 
 from app.downloaders.base_downloader import BaseDownloader
 from app.file import File
+from app.type import Type
 
 
 class SWDownload(BaseDownloader):
@@ -12,13 +15,18 @@ class SWDownload(BaseDownloader):
 
     def __init__(self, url, directory=None):
         super().__init__(url, directory=directory)
-        html = requests.get(url)
-        self.soup = BeautifulSoup(html.text, "html.parser")
+        self.expected_host = os.getenv("SW_DOWNLOAD_HOST")
+
+    def is_valid(self):
+        parsed_url = urlparse(self.url)
+        return parsed_url.hostname == self.expected_host
 
     def run(self):
         try:
+            html = requests.get(self.url)
+            self.soup = BeautifulSoup(html.text, "html.parser")
             cwd = self._get_download_directory()
-            self.file = File.new_file(self.url, cwd)
+            self.file = File.new_file(self.url, Type.TYPE_SW_ID, cwd)
             self.id = self.file.id
             self.sw_download(cwd)
             self.file.complete()

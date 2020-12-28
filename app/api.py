@@ -3,30 +3,17 @@ import logging
 import os
 
 from flask import Response, request, render_template, jsonify
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import BadRequest, NotFound
 
 from app import errors  # noqa: F401
 from app.directory import get_directories_in_path
-from app.downloaders.gallery_download import GalleryDownload
-from app.downloaders.sw_download import SWDownload
-from app.downloaders.youtube_download import YoutubeDownload
+from app.downloaders.get_downloader import get_downloader
 from app.file import File
 from app.settings import Settings
 from app.main import app, db
 
 logFormatter = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(format=logFormatter, level=os.environ.get("LOGLEVEL", "INFO"))
-
-download_types = {
-    "youtube": YoutubeDownload,
-    "gallery": GalleryDownload,
-    "sw": SWDownload,
-}
-port = {"youtube": 5000, "gallery": 5050, "sw": 5075}
-download_type = os.getenv("DOWNLOAD_TYPE", None)
-if download_type not in download_types:
-    raise ValueError(f"DOWNLOAD_TYPE {download_type} not recognized")
-downloader = download_types[download_type]
 
 
 def json_response(payload, status):
@@ -36,7 +23,7 @@ def json_response(payload, status):
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def index(path):
-    return render_template("index.html", download_type=download_type.title())
+    return render_template("index.html")
 
 
 @app.route("/api/downloads", methods=["GET"])
@@ -69,7 +56,10 @@ def download(file_id):
 
 
 def start_download(url, directory):
-    download = downloader(url, directory=directory)
+    download = get_downloader(url, directory=directory)
+    if download is None:
+        raise BadRequest
+
     download.start()
     while download.id is None:
         pass
@@ -100,4 +90,4 @@ def get_directories():
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(host="0.0.0.0", port=port[download_type])
+    app.run(host="0.0.0.0", port=5000)
