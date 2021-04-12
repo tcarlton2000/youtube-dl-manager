@@ -140,7 +140,7 @@ export const sleep = time => {
 };
 
 export const downloadListMock = () => {
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({
       ok: true,
       json: () => Promise.resolve(downloadList),
@@ -149,7 +149,7 @@ export const downloadListMock = () => {
 };
 
 export const paginatedDownloadListMock = () => {
-  jest.spyOn(global, 'fetch').mockImplementation(url => {
+  global.fetch = jest.fn(url => {
     if (url.includes('2')) {
       return Promise.resolve({
         ok: true,
@@ -165,7 +165,7 @@ export const paginatedDownloadListMock = () => {
 };
 
 export const filteredDownloadListMock = () => {
-  jest.spyOn(global, 'fetch').mockImplementation(url => {
+  global.fetch = jest.fn(url => {
     if (url.includes('Completed,Error') && url.includes('page=1')) {
       return Promise.resolve({
         ok: true,
@@ -191,7 +191,7 @@ export const filteredDownloadListMock = () => {
 };
 
 export const downloadListError = () => {
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({
       ok: false,
       json: () =>
@@ -210,7 +210,7 @@ export const defaultDownloadSettings = () => {
     },
   };
 
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({
       ok: true,
       json: () => Promise.resolve(settingsMock),

@@ -2,7 +2,6 @@ import '@testing-library/jest-dom/extend-expect';
 
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
-import 'isomorphic-fetch';
 import { renderWithSettings } from 'Utils/mocks';
 import { Settings } from './SettingsPage';
 import { defaultDownloadSettings } from 'Utils/mocks';
@@ -56,7 +55,7 @@ test('should update and submit change', async () => {
   });
 
   // THEN
-  jest.spyOn(global, 'fetch').mockImplementation((url, init) => {
+  global.fetch = jest.fn((url, init) => {
     expect(init.body).toBe(
       JSON.stringify({
         settings: {
@@ -87,7 +86,7 @@ test('should display error message on API failure', async () => {
   const { queryByText, findByText } = renderWithSettings(<Settings />);
 
   // THEN
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({
       ok: false,
     });
