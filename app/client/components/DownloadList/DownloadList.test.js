@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 import { renderWithSettings } from 'Utils/mocks';
-import 'isomorphic-fetch';
 import DownloadList from '../DownloadList';
 import {
   downloadListMock,

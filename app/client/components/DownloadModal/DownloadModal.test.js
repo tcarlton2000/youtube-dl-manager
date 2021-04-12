@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import { fireEvent } from '@testing-library/react';
 import { renderWithSettings } from 'Utils/mocks';
-import 'isomorphic-fetch';
 import DownloadModal from '../DownloadModal';
 
 afterEach(() => {
@@ -22,7 +21,7 @@ test('should open DownloadModal on button click', () => {
 
 test('should POST and close modal on Download click', () => {
   // GIVEN
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({});
   });
 
@@ -37,7 +36,7 @@ test('should POST and close modal on Download click', () => {
 
 test('should close on Cancel click', () => {
   // GIVEN
-  jest.spyOn(global, 'fetch').mockImplementation(() => {
+  global.fetch = jest.fn(() => {
     return Promise.resolve({});
   });
 
@@ -52,7 +51,7 @@ test('should close on Cancel click', () => {
 
 test('should fill in directory when clicked on tree', async () => {
   // GIVEN
-  jest.spyOn(global, 'fetch').mockImplementation(url => {
+  global.fetch = jest.fn(url => {
     return Promise.resolve({
       ok: true,
       json: () =>
@@ -75,7 +74,7 @@ test('should fill in directory when clicked on tree', async () => {
   fireEvent.click(dirOne);
 
   // GIVEN
-  jest.spyOn(global, 'fetch').mockImplementation((url, payload) => {
+  global.fetch = jest.fn((url, payload) => {
     expect(payload.body).toBe('{"url":"","directory":"/downloads/dirOne"}');
   });
 
