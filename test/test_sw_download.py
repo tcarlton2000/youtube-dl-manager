@@ -31,7 +31,7 @@ def test_sw_download(mocked_open, mocked_mkdir, mocked_chdir, mocked_requests_ge
     sw_download.run()
 
     # THEN
-    full_download_path = f"{download_dir}/Mock Title"
+    full_download_path = f"{download_dir}/Test Mock Title"
     mocked_mkdir.assert_called_with(full_download_path)
     mocked_chdir.assert_called_with(full_download_path)
     mocked_open.assert_has_calls(

@@ -1,5 +1,6 @@
 import logging
 import requests
+import string
 import os
 
 from bs4 import BeautifulSoup
@@ -12,6 +13,7 @@ from app.type import Type
 
 class SWDownload(BaseDownloader):
     logger = logging.getLogger("SWDownload")
+    valid_filename_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
 
     def __init__(self, url, directory=None):
         super().__init__(url, directory=directory)
@@ -40,11 +42,14 @@ class SWDownload(BaseDownloader):
         return urls
 
     def create_album_directory(self, base_dir):
-        gallery_name = self.soup.title.string.strip()
+        gallery_name = self.remove_invalid_chars(self.soup.title.string.strip())
         self.file.update_db({"name": gallery_name})
         path = os.path.join(base_dir, gallery_name)
         os.mkdir(path)
         return path
+
+    def remove_invalid_chars(self, path):
+        return "".join(c for c in path if c in self.valid_filename_chars)
 
     def download_all_images(self, urls, download_dir):
         os.chdir(download_dir)
