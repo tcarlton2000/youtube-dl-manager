@@ -43,7 +43,9 @@ def get_downloads():
 @app.route("/api/downloads", methods=["POST"])
 def new_download():
     body = request.json
-    resp = start_download(body["url"], body.get("directory", None))
+    resp = start_download(
+        body["url"], body.get("directory", None), body.get("downloader", None)
+    )
     return json_response(resp, 201)
 
 
@@ -55,8 +57,8 @@ def download(file_id):
     return json_response(_file.marshal(), 200)
 
 
-def start_download(url, directory):
-    download = get_downloader(url, directory=directory)
+def start_download(url, directory, downloader):
+    download = get_downloader(url, directory=directory, downloader=downloader)
     if download is None:
         raise BadRequest
 

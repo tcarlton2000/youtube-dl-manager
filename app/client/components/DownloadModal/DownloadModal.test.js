@@ -49,6 +49,18 @@ test('should close on Cancel click', () => {
   expect(global.fetch).toHaveBeenCalledTimes(0);
 });
 
+test('should send correct payload for youtube downloader', () => {
+  downloaderTest('Youtube', 'youtube');
+});
+
+test('should send correct payload for gallery downloader', () => {
+  downloaderTest('Gallery', 'gallery');
+});
+
+test('should send correct payload for sw downloader', () => {
+  downloaderTest('SW', 'sw');
+});
+
 test('should fill in directory when clicked on tree', async () => {
   // GIVEN
   global.fetch = jest.fn(url => {
@@ -75,10 +87,30 @@ test('should fill in directory when clicked on tree', async () => {
 
   // GIVEN
   global.fetch = jest.fn((url, payload) => {
-    expect(payload.body).toBe('{"url":"","directory":"/downloads/dirOne"}');
+    expect(payload.body).toBe(
+      '{"url":"","directory":"/downloads/dirOne","downloader":"auto"}',
+    );
   });
 
   // WHEN
   const downloadButton = await getByText('OK');
   fireEvent.click(downloadButton);
 });
+
+const downloaderTest = (downloader, expectedPayload) => {
+  // WHEN
+  const { getByText } = renderWithSettings(<DownloadModal />);
+  fireEvent.click(getByText('New Download...'));
+  fireEvent.mouseDown(getByText('Auto'));
+  fireEvent.click(getByText(downloader));
+
+  // THEN
+  global.fetch = jest.fn((url, payload) => {
+    expect(payload.body).toBe(
+      `{"url":"","directory":"/downloads","downloader":"${expectedPayload}"}`,
+    );
+  });
+
+  const downloadButton = getByText('OK');
+  fireEvent.click(downloadButton);
+};
