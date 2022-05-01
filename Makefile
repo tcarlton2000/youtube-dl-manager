@@ -26,7 +26,7 @@ unittest:
 	npm test
 
 run-local-python:
-	CONFIG=${PWD} pipenv run python app/api.py
+	PYTHONPATH=${PWD} CONFIG=${PWD} pipenv run python app/api.py
 
 clean:
 	rm -rf app/test.db
